@@ -1,0 +1,6 @@
+PySide6~=6.7.1
+opencv-python~=4.10.0.84
+qimage2ndarray~=1.10.0
+numpy==2.0.0
+Pillow==10.1.0
+pyserial==3.5

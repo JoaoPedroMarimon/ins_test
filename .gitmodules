@@ -1,0 +1,3 @@
+[submodule "src/inspection_designer"]
+	path = src/inspection_designer
+	url = https://git.intelbras.com.br/equipe-automacao/utilities/inspection_designer.git
