@@ -54,7 +54,6 @@ def main_parse():
     add_parser = subparser.add_parser("add", help="Adiciona um novo produto no arquivo.")
     add_parser.add_argument("name", type=str, help="Nome do produto, sem caracteres especiais.")
     add_parser.add_argument("code", type=str, help="Código do produto.")
-    add_parser.add_argument("test_config_name", type=str, help="Nome da configuração de teste (vantage).")
 
     edit_parser = subparser.add_parser("edit", help="Edita um produto existente no arquivo.")
     group = edit_parser.add_mutually_exclusive_group(required=True)
@@ -91,8 +90,6 @@ def main_parse():
                        help="Código do produto destino existente no arquivo.")
 
     group = clone_parser.add_argument_group()
-    group.add_argument("-lic", "--led-inspection-config", action="store_true",
-                       help="Clona as configurações da inspeção de LEDS.")
     group.add_argument("-pic", "--pad-inspection-config", action="store_true",
                        help="Clona as configurações da inspeção de tampografia")
     return parser.parse_args()
@@ -116,10 +113,8 @@ def execute_parse(args) -> None:
 
     if args.subparser == "add":
         product_data = {"name": args.name.upper().replace(" ", ""),
-                        "test_config_name": args.test_config_name.upper().replace(" ", ""),
                         "code": args.code,
-                        "led-inspection": {"active": True, "inspection_areas": {}},
-                        "pad-inspection": {"active": True, "inspection_areas": {}}}
+                        "pad-inspection": {"active": True, "classes": []}}
 
         config["products"].append(product_data)
         config["products"] = sorted(config["products"], key=lambda x: int(x["code"]))
@@ -141,9 +136,7 @@ def execute_parse(args) -> None:
         product_data = get_product_from_configfile(args.code, args.name, config)
 
         if args.inspection == "pad-inspection":
-            inspection_obj = inspection.PadInspection(True, f"./src/products/{product_data['name']}")
-        else:
-            inspection_obj = inspection.LedInspection(True)
+            inspection_obj = inspection.PadInspection(templates_path=f"./templates/{product_data['name']}")
 
         inspection_obj.config = product_data[args.inspection]
         window = inspection_obj.designer(product_data['name'])
@@ -160,8 +153,6 @@ def execute_parse(args) -> None:
 
         # it clones only when -lic and/or -pic are specified
         if args.led_inspection_config or args.pad_inspection_config:
-            if args.led_inspection_config:
-                dest_product_data["led-inspection"] = target_product_data["led-inspection"]
             if args.pad_inspection_config:
                 dest_product_data["pad-inspection"] = target_product_data["pad-inspection"]
 

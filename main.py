@@ -21,7 +21,7 @@ def main():
     port = args.serial_port if args.serial_port else port
     #ser = src.SerialController(port, args.no_serial, args.debug)'''
 
-    config: dict = src.load_json_configfile("./config.json")
+    config: dict = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
 
     url = src.get_rtsp_url(**src.DEFAULT_CONFIGFILE["camera"])
     logging.debug(url)
@@ -34,8 +34,8 @@ def main():
     #instantiates the interface for product selection and test status, it uses camera subtype (must be configured)
     #intf = src.Interface(src.get_rtsp_url(subtype=1, **config["camera"]), configfile_dir="./src")
 
-    pad_inspec = src.PadInspection(True, templates_path="./templates")
-    pad_inspec.config = config["pad-inspection"]
+    pad_inspec = src.PadInspection(templates_path=f"./templates/{config['products'][0]['name']}")
+    pad_inspec.config = config["products"][0]["pad-inspection"]
 
     while True:
         ret, frame = camera.read()
