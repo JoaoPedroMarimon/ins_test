@@ -6,7 +6,8 @@ from .environment import (DEFAULT_CONFIGFILE, CONFIGFILE_PATHNAME,
                           PAD_INSPECT_TIMEOUT)
 
 
-#from .interface import Interface
+from .IHM.interface import Interface
+from .IHM.hmi_client import HMIClient
 from .inspection_designer.inspection_designer.inspection import PadInspection
 from .logger import init_logging
 #from .messenger.messenger import QueueMessenger
@@ -15,5 +16,5 @@ from .serial_connection import SerialController
 
 from .utils import (get_port_connection, get_all_ports,
                     load_json_configfile, get_rtsp_url,
-                    ThreadedVideoCapture, graceful_handler,
+                    ThreadedVideoCapture,
                     try_camera_connection)
