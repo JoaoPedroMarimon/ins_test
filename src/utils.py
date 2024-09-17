@@ -6,7 +6,7 @@ import time
 import threading
 import warnings
 import multiprocessing
-from tkinter.messagebox import showerror
+# from tkinter.messagebox import showerror
 from typing import Callable
 
 import cv2
@@ -173,7 +173,7 @@ def graceful_handler(method: Callable):
         pass
 
     except Exception as e:
-        showerror(title="Erro inesperado", message=str(e))
+        # showerror(title="Erro inesperado", message=str(e))
         logging.exception(e)
 
 
