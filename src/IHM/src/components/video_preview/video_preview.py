@@ -1,0 +1,53 @@
+import cv2
+import numpy as np
+import qimage2ndarray
+from PySide6.QtCore import Signal, QSize
+from PySide6.QtGui import QPixmap
+from PySide6.QtWidgets import QWidget, QVBoxLayout
+from src.IHM.src.components.video_preview.videoqthread import VideoQThread, get_rtsp_url
+from src.IHM.src.components.video_preview.photo_viewer import PhotoViewer
+
+
+class VideoPreview(QWidget):
+    onVideoOpen = Signal()
+    onVideonotOpened = Signal()
+    def __init__(self, parent=None):
+        """
+        This component has the resposability to show the images from the VideoQThread class,
+         passing the images and setting in Photoviewer
+        """
+        super().__init__(parent)
+        self._creating_instances()
+        self._adjusting_photo_viewer()
+
+    def _creating_instances(self):
+        self.video_thread = None
+        self._camera_source = get_rtsp_url("10.0.0.101","admin","admin123")
+        self._size: tuple[int, int] = (self.parent().size().width(), self.parent().size().height())
+        self.photo_viewer = PhotoViewer(self)
+
+    def _adjusting_photo_viewer(self):
+        self.vertical_layout = QVBoxLayout(self)
+        self.photo_viewer.resize(QSize(self._size[0], self._size[1]))
+        self.vertical_layout.addWidget(self.photo_viewer)
+
+    def start_video(self):
+        self.video_thread = VideoQThread(self._camera_source, self)
+        self.video_thread.imageSig.connect(self._update_video_label)
+        self.video_thread.videoOpenedSig.connect(self._on_video_open)
+        self.video_thread.videoNotOpenedSig.connect(self._on_video_not_opened)
+
+        self.video_thread.start()
+
+    def _update_video_label(self, frame: np.ndarray):
+        self._latest_frame = frame
+        frame = cv2.resize(frame, self._size, cv2.INTER_AREA)
+        q_image = qimage2ndarray.array2qimage(frame)
+        pixmap = QPixmap.fromImage(q_image)
+        self.photo_viewer.set_photo(pixmap)
+
+    def _on_video_open(self):
+        self.onVideoOpen.emit()
+
+    def _on_video_not_opened(self):
+        self.onVideonotOpened.emit()
