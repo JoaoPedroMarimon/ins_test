@@ -13,14 +13,14 @@ def main():
     if args.subparser is not None or args.serial_data:
         src.execute_parse(args)
         return
-
-    '''port: str = src.get_port_connection()
+'''
+    port: str = src.get_port_connection()
     if not port and not args.no_serial and not args.serial_port:
         msg = f"Não foi possível encontrar a porta do Arduino, portas listadas: {src.get_all_ports()}"
         raise ConnectionError(msg)
     port = args.serial_port if args.serial_port else port
-    #ser = src.SerialController(port, args.no_serial, args.debug)'''
-
+    #ser = src.SerialController(port, args.no_serial, args.debug)
+'''
     config: dict = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
 
     url = src.get_rtsp_url(**src.DEFAULT_CONFIGFILE["camera"])
@@ -34,6 +34,8 @@ def main():
     #instantiates the interface for product selection and test status, it uses camera subtype (must be configured)
     #intf = src.Interface(src.get_rtsp_url(subtype=1, **config["camera"]), configfile_dir="./src")
 
+
+
     pad_inspec = src.PadInspection(templates_path=f"./templates/{config['products'][0]['name']}")
     pad_inspec.config = config["products"][0]["pad-inspection"]
 
@@ -44,7 +46,7 @@ def main():
         if inspecao_ok:
             print("Tudo ok")
         else:
-           print ("teste reprovado")
+            print ("teste reprovado")
 
 if __name__ == '__main__':
     main()
