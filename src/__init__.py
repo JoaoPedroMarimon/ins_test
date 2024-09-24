@@ -17,3 +17,5 @@ from .utils import (get_port_connection, get_all_ports,
                     load_json_configfile, get_rtsp_url,
                     ThreadedVideoCapture, graceful_handler,
                     try_camera_connection)
+
+from .IHM.ihm import IHM

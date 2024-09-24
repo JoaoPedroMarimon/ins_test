@@ -3,6 +3,7 @@ import os
 import time
 import serial
 import src
+import cv2
 
 from datetime import datetime
 from logging import exception
@@ -53,23 +54,95 @@ def verificar_conexao_camera(config_camera):
             time.sleep(3)  # Espera 3 segundos antes de tentar novamente
     return camera
 
-def tentar_enviar_reproved(ser, args):
+def capturar_frame(camera):
     """
-    Função que verifica a conexão serial antes de enviar ser.reproved().
-    Caso a conexão seja perdida, a função tentará reconectar e só então enviar o comando.
+    Captura um frame da câmera.
+
+    :param camera: Objeto da câmera.
+    :return: O frame capturado.
     """
-    while True:
-        # Verifica se a conexão serial está ativa
-        if ser is None:
-            print("Conexão serial perdida. Tentando reconectar...")
-            ser = tentar_conectar_serial(args)  # Tenta reconectar
-        try:
-            ser.reproved()  # Envia o comando após reconectar
-            print("Comando 'reproved' enviado com sucesso.")
-            break  # Sai do loop se o comando for enviado com sucesso
-        except Exception as e:
-            print(f"Erro ao enviar reproved: {e}. Verificando conexão serial...")
-            ser = None  # Marca a conexão como perdida e tenta reconectar
+    ret, frame = camera.read()
+    if not ret:
+        print("Erro ao capturar frame")
+        return None
+    return frame
+
+def salvar_imagem_processada(frame, pasta=".", nome_imagem="imagem_processada.jpg"):
+    """
+    Salva a imagem processada em um diretório especificado.
+
+    :param frame: A imagem processada (frame da câmera).
+    :param pasta: Caminho da pasta onde a imagem será salva (padrão é o diretório atual).
+    :param nome_imagem: Nome do arquivo da imagem (padrão é 'imagem_processada.png').
+    """
+    if not os.path.exists(pasta):
+        os.makedirs(pasta)
+    caminho_imagem = os.path.join(pasta, nome_imagem)
+    cv2.imwrite(caminho_imagem, frame)
+    print(f"Imagem processada e salva em: {caminho_imagem}")
+
+def inspecionar_frame(frame, pad_inspec):
+    """
+    Aplica a inspeção à imagem capturada.
+
+    :param frame: O frame capturado da câmera.
+    :param pad_inspec: Objeto da classe PadInspection que realiza a inspeção.
+    :return: Retorna o frame processado e o resultado da inspeção (True se passou, False se reprovou).
+    """
+    frame_processado, cfg = pad_inspec.frame_inspect(frame)
+    inspecao_ok = pad_inspec.validate_config_result(cfg)
+    return frame_processado, inspecao_ok
+
+def classificar_resultado(inspecao_ok):
+    """
+    Classifica o resultado da inspeção e imprime o status.
+
+    :param inspecao_ok: Resultado da inspeção (True se passou, False se reprovou).
+    :return: Retorna 'OK' ou 'NOK' de acordo com o resultado da inspeção.
+    """
+    if inspecao_ok:
+        print("OK")
+        #return "OK"
+    else:
+        print("NOK")
+        #return "NOK"
+
+def processar_frame(frame, pad_inspec, status, pasta=".", nome_imagem="imagem_processada.jpg"):
+    """
+    Processa o frame da câmera de acordo com o status do produto.
+
+    :param frame: O frame capturado da câmera.
+    :param pad_inspec: Objeto da classe PadInspection para processar e inspecionar o frame.
+    :param status: String que define a ação ('SAVE', 'INSPSAVE', 'INSPSAVECLASSIFY', 'INSPCLASSIFY').
+    :param pasta: Diretório onde a imagem será salva (se necessário).
+    :param nome_imagem: Nome do arquivo da imagem a ser salva (se necessário).
+    :return: Retorna o resultado da classificação (OK/NOK) se houver inspeção e classificação.
+    """
+    inspecao_ok = None
+    resultado_classificacao = None
+
+    if status == "SAVE":
+        # Apenas salvar a imagem capturada
+        salvar_imagem_processada(frame, pasta=pasta, nome_imagem=nome_imagem)
+
+    elif status == "INSPSAVE":
+        # Inspecionar e salvar a imagem
+        frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+        salvar_imagem_processada(frame_processado, pasta=pasta, nome_imagem=nome_imagem)
+        print(f"Inspecao:{inspecao_ok}")
+
+    elif status == "INSPSAVECLASSIFY":
+        # Inspecionar, salvar e classificar
+        frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+        salvar_imagem_processada(frame_processado, pasta=pasta, nome_imagem=nome_imagem)
+        resultado_classificacao = classificar_resultado(inspecao_ok)
+
+    elif status == "INSPCLASSIFY":
+        # Inspecionar e classificar (sem salvar)
+        frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+        resultado_classificacao = classificar_resultado(inspecao_ok)
+
+    return resultado_classificacao
 
 def main():
     args = src.main_parse()
@@ -80,43 +153,39 @@ def main():
         src.execute_parse(args)
         return
 
-    # Conectar à porta serial
     ser = verificar_conexao_serial(args)
-
-    # Conectar à câmera
     camera = verificar_conexao_camera(src.DEFAULT_CONFIGFILE["camera"])
+    config = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
 
-    # Carrega a configuração do arquivo JSON
-    config: dict = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
+    ihm = src.IHM()
+    print(ihm.modelo())
+
+
 
     pad_inspec = src.PadInspection(templates_path=f"./templates/{config['products'][0]['name']}")
     pad_inspec.config = config["products"][0]["pad-inspection"]
 
-    print("Tela 1")
-
     while True:
-        comando = input("Digite 'tela 2': ")
-        if comando == "tela 2":
-            print(f"Tela 2 selecionada")
+        frame = capturar_frame(camera)
+        if frame is None:
+            break
 
-            # Iniciar loop de inspeção
-            while True:
-                ret, frame = camera.read()  # Captura o frame da câmera
-                if not ret:
-                    print("Erro ao capturar frame da câmera")
-                    break  # Se a captura falhar, sai do loop
+        produto_config = config['products'][0]
+        status = produto_config['status']
 
-                # Realiza a inspeção no frame capturado
-                frame, cfg = pad_inspec.frame_inspect(frame)
-                inspecao_ok = pad_inspec.validate_config_result(cfg)
+        resultado_classificacao = processar_frame(
+            frame,
+            pad_inspec,
+            status=status,
+            pasta="./imagens_processadas",
+            nome_imagem=f"imagem_{produto_config['name']}.jpg"
+        )
 
-                # Verifica o resultado da inspeção
-                if inspecao_ok:
-                    print("Tudo ok")
-                else:
-                    print("Teste reprovado")
-        else:
-            print("Opção inválida")
+        # Exibe o resultado da classificação se houver
+        if resultado_classificacao is not None:
+            print(f"Resultado da classificação: {resultado_classificacao}")
+
+        time.sleep(5)
 
 if __name__ == '__main__':
     main()
