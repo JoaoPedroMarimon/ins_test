@@ -12,12 +12,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__()
         self.setupUi(self)
         # Executa uma função lambda(anônima) em linha, fazendo com que chame a função de mostrar a tela passando o modelo
-        self.button_model_a.clicked.connect(lambda: self.set_model_switch('TOGGLE SWITCH'))
-        self.button_model_b.clicked.connect(lambda: self.set_model_switch('LEVER SWITCH'))
-        self.button_model_c.clicked.connect(lambda: self.set_model_switch('KEY SWITCH'))
-        self.button_model_d.clicked.connect(lambda: self.set_model_switch('PUSH BUTTON SWITCH'))
-        self.button_model_e.clicked.connect(lambda: self.set_model_switch('DUAL IN-LINE PACKAGE SWITCH'))
-        self.button_model_f.clicked.connect(lambda: self.set_model_switch('REED SWITCH'))
+        self.button_model_sf800.clicked.connect(lambda: self.set_model_switch('SF 800 Q+'))
+        self.button_model_sg800.clicked.connect(lambda: self.set_model_switch('SG 800 Q+'))
+        self.button_model_s1108f.clicked.connect(lambda: self.set_model_switch('S 1108 F'))
+        self.button_model_s1108g.clicked.connect(lambda: self.set_model_switch('S 1108 G'))
 
     def closeEvent(self, event):
         self.OnClose.emit()

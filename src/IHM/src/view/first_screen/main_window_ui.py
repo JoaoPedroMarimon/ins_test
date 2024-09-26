@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'mainyaVxSp.ui'
+## Form generated from reading UI file 'mainspmSIQ.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.1
+## Created by: Qt User Interface Compiler version 6.7.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -66,25 +66,25 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.button_model_a = QPushButton(self.widget)
-        self.button_model_a.setObjectName(u"button_model_a")
-        self.button_model_a.setMaximumSize(QSize(400, 75))
+        self.button_model_sf800 = QPushButton(self.widget)
+        self.button_model_sf800.setObjectName(u"button_model_sf800")
+        self.button_model_sf800.setMaximumSize(QSize(400, 75))
         font3 = QFont()
         font3.setFamilies([u"Helvetica Now Var Micro Medium"])
         font3.setPointSize(12)
         font3.setBold(False)
-        self.button_model_a.setFont(font3)
-        self.button_model_a.setStyleSheet(u"background-color: #008000; color: white;")
+        self.button_model_sf800.setFont(font3)
+        self.button_model_sf800.setStyleSheet(u"background-color: #008000; color: white;")
 
-        self.horizontalLayout.addWidget(self.button_model_a)
+        self.horizontalLayout.addWidget(self.button_model_sf800)
 
-        self.button_model_b = QPushButton(self.widget)
-        self.button_model_b.setObjectName(u"button_model_b")
-        self.button_model_b.setMaximumSize(QSize(400, 75))
-        self.button_model_b.setFont(font3)
-        self.button_model_b.setStyleSheet(u"background-color: #008000; color: white;")
+        self.button_model_sg800 = QPushButton(self.widget)
+        self.button_model_sg800.setObjectName(u"button_model_sg800")
+        self.button_model_sg800.setMaximumSize(QSize(400, 75))
+        self.button_model_sg800.setFont(font3)
+        self.button_model_sg800.setStyleSheet(u"background-color: #008000; color: white;")
 
-        self.horizontalLayout.addWidget(self.button_model_b)
+        self.horizontalLayout.addWidget(self.button_model_sg800)
 
 
         self.horizontalLayout_4.addLayout(self.horizontalLayout)
@@ -98,59 +98,31 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.button_model_c = QPushButton(self.widget_3)
-        self.button_model_c.setObjectName(u"button_model_c")
-        self.button_model_c.setMaximumSize(QSize(400, 75))
-        self.button_model_c.setFont(font3)
-        self.button_model_c.setStyleSheet(u"background-color: #008000; color: white;")
+        self.button_model_s1108f = QPushButton(self.widget_3)
+        self.button_model_s1108f.setObjectName(u"button_model_s1108f")
+        self.button_model_s1108f.setMaximumSize(QSize(400, 75))
+        self.button_model_s1108f.setFont(font3)
+        self.button_model_s1108f.setStyleSheet(u"background-color: #008000; color: white;")
 
-        self.horizontalLayout_2.addWidget(self.button_model_c)
+        self.horizontalLayout_2.addWidget(self.button_model_s1108f)
 
-        self.button_model_d = QPushButton(self.widget_3)
-        self.button_model_d.setObjectName(u"button_model_d")
-        self.button_model_d.setMaximumSize(QSize(400, 75))
+        self.button_model_s1108g = QPushButton(self.widget_3)
+        self.button_model_s1108g.setObjectName(u"button_model_s1108g")
+        self.button_model_s1108g.setMaximumSize(QSize(400, 75))
         font4 = QFont()
         font4.setFamilies([u"Helvetica Now Var Text Medium"])
         font4.setPointSize(12)
         font4.setBold(False)
-        self.button_model_d.setFont(font4)
-        self.button_model_d.setStyleSheet(u"background-color: #008000; color: white;")
+        self.button_model_s1108g.setFont(font4)
+        self.button_model_s1108g.setStyleSheet(u"background-color: #008000; color: white;")
 
-        self.horizontalLayout_2.addWidget(self.button_model_d)
+        self.horizontalLayout_2.addWidget(self.button_model_s1108g)
 
 
         self.horizontalLayout_6.addLayout(self.horizontalLayout_2)
 
 
         self.verticalLayout.addWidget(self.widget_3)
-
-        self.widget_2 = QWidget(self.widget_4)
-        self.widget_2.setObjectName(u"widget_2")
-        self.horizontalLayout_5 = QHBoxLayout(self.widget_2)
-        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.horizontalLayout_3 = QHBoxLayout()
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.button_model_e = QPushButton(self.widget_2)
-        self.button_model_e.setObjectName(u"button_model_e")
-        self.button_model_e.setMaximumSize(QSize(400, 75))
-        self.button_model_e.setFont(font4)
-        self.button_model_e.setStyleSheet(u"background-color: #008000; color: white;")
-
-        self.horizontalLayout_3.addWidget(self.button_model_e)
-
-        self.button_model_f = QPushButton(self.widget_2)
-        self.button_model_f.setObjectName(u"button_model_f")
-        self.button_model_f.setMaximumSize(QSize(400, 75))
-        self.button_model_f.setFont(font3)
-        self.button_model_f.setStyleSheet(u"background-color: #008000; color: white;")
-
-        self.horizontalLayout_3.addWidget(self.button_model_f)
-
-
-        self.horizontalLayout_5.addLayout(self.horizontalLayout_3)
-
-
-        self.verticalLayout.addWidget(self.widget_2)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.label.raise_()
@@ -166,11 +138,9 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"ESCOLHA O MODELO SWITCH PARA O TESTE", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"INTELBRAS", None))
-        self.button_model_a.setText(QCoreApplication.translate("MainWindow", u"Toggle Switch", None))
-        self.button_model_b.setText(QCoreApplication.translate("MainWindow", u"Lever Switch", None))
-        self.button_model_c.setText(QCoreApplication.translate("MainWindow", u"Key Switch", None))
-        self.button_model_d.setText(QCoreApplication.translate("MainWindow", u"Push Button Switch", None))
-        self.button_model_e.setText(QCoreApplication.translate("MainWindow", u"Dual In-line Package Switch", None))
-        self.button_model_f.setText(QCoreApplication.translate("MainWindow", u"Reed Switch", None))
+        self.button_model_sf800.setText(QCoreApplication.translate("MainWindow", u"SF 800 Q+", None))
+        self.button_model_sg800.setText(QCoreApplication.translate("MainWindow", u"SG 800 Q+", None))
+        self.button_model_s1108f.setText(QCoreApplication.translate("MainWindow", u"S 1108 F", None))
+        self.button_model_s1108g.setText(QCoreApplication.translate("MainWindow", u"S 1108 G", None))
     # retranslateUi
 
