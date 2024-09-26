@@ -19,30 +19,26 @@
   <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>10</x>
      <y>320</y>
-     <width>361</width>
-     <height>80</height>
+     <width>341</width>
+     <height>71</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QPushButton" name="button_continue">
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
       <property name="styleSheet">
-       <string notr="true">background-color: #00A336; color: white;</string>
+       <string notr="true">background-color: #FFCC00; color: white;</string>
       </property>
       <property name="text">
-       <string>CONTINUAR SEM INSPEÇÃO</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="button_turn_off">
-      <property name="styleSheet">
-       <string notr="true">background-color: red; color: white;</string>
-      </property>
-      <property name="text">
-       <string>PARAR DE INSPECIONAR</string>
+       <string>CONTINUAR PROCESSO</string>
       </property>
      </widget>
     </item>
@@ -52,7 +48,7 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>280</y>
+     <y>170</y>
      <width>361</width>
      <height>31</height>
     </rect>
@@ -63,29 +59,10 @@
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color:white</string>
+    <string notr="true">color: white;</string>
    </property>
    <property name="text">
     <string>LIMITE DE PEÇAS ULTRAPASSADO</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignmentFlag::AlignCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>0</y>
-     <width>351</width>
-     <height>271</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="pixmap">
-    <pixmap>../../docs_image/alert_background.png</pixmap>
    </property>
    <property name="alignment">
     <set>Qt::AlignmentFlag::AlignCenter</set>
