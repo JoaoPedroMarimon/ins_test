@@ -139,7 +139,7 @@ def execute_parse(args) -> None:
         product_data = get_product_from_configfile(args.code, args.name, config)
 
         if args.inspection == "pad-inspection":
-            inspection_obj = inspection.PadInspection(templates_path=f"./templates/{product_data['name']}")
+            inspection_obj = inspection.TemplateInspection(templates_path=f"./samples/{product_data['name']}/templates")
 
         inspection_obj.config = product_data[args.inspection]
         window = inspection_obj.designer(product_data['name'])

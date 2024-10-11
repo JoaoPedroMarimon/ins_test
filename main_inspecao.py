@@ -1,18 +1,12 @@
 import logging
 import os
 import time
-
-import cv2
 import serial
 import src
+import cv2
 
 from datetime import datetime
 from logging import exception
-from src import IHM
-from src import Interface
-from src.IHM.src.components.communication.ihm_client import IHMClient
-from src.IHM.src.components.video_preview.videoqthread import get_rtsp_url
-
 
 def verificar_conexao_serial(args):
     """
@@ -59,23 +53,6 @@ def verificar_conexao_camera(config_camera):
             camera = None  # Garante que ele tente novamente no loop
             time.sleep(3)  # Espera 3 segundos antes de tentar novamente
     return camera
-def tentar_enviar_reproved(ser, args):
-    """
-    Função que verifica a conexão serial antes de enviar ser.reproved().
-    Caso a conexão seja perdida, a função tentará reconectar e só então enviar o comando.
-    """
-    while True:
-        # Verifica se a conexão serial está ativa
-        if ser is None:
-            print("Conexão serial perdida. Tentando reconectar...")
-            ser = tentar_conectar_serial(args)  # Tenta reconectar
-        try:
-            ser.reproved()  # Envia o comando após reconectar
-            print("Comando 'reproved' enviado com sucesso.")
-            break  # Sai do loop se o comando for enviado com sucesso
-        except Exception as e:
-            print(f"Erro ao enviar reproved: {e}. Verificando conexão serial...")
-            ser = None  # Marca a conexão como perdida e tenta reconectar
 
 def capturar_frame(camera):
     """
@@ -125,47 +102,8 @@ def classificar_resultado(inspecao_ok):
     """
     if inspecao_ok:
         print("OK")
-        #return "OK"
     else:
         print("NOK")
-        #return "NOK"
-
-def processar_frame(frame, pad_inspec, status, pasta=".", nome_imagem="imagem_processada.jpg"):
-    """
-    Processa o frame da câmera de acordo com o status do produto.
-
-    :param frame: O frame capturado da câmera.
-    :param pad_inspec: Objeto da classe PadInspection para processar e inspecionar o frame.
-    :param status: String que define a ação ('SAVE', 'INSPSAVE', 'INSPSAVECLASSIFY', 'INSPCLASSIFY').
-    :param pasta: Diretório onde a imagem será salva (se necessário).
-    :param nome_imagem: Nome do arquivo da imagem a ser salva (se necessário).
-    :return: Retorna o resultado da classificação (OK/NOK) se houver inspeção e classificação.
-    """
-    inspecao_ok = None
-    resultado_classificacao = None
-
-    if status == "SAVE":
-        # Apenas salvar a imagem capturada
-        salvar_imagem_processada(frame, pasta=pasta, nome_imagem=nome_imagem)
-
-    elif status == "INSPSAVE":
-        # Inspecionar e salvar a imagem
-        frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
-        salvar_imagem_processada(frame_processado, pasta=pasta, nome_imagem=nome_imagem)
-        print(f"Inspecao:{inspecao_ok}")
-
-    elif status == "INSPSAVECLASSIFY":
-        # Inspecionar, salvar e classificar
-        frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
-        salvar_imagem_processada(frame_processado, pasta=pasta, nome_imagem=nome_imagem)
-        resultado_classificacao = classificar_resultado(inspecao_ok)
-
-    elif status == "INSPCLASSIFY":
-        # Inspecionar e classificar (sem salvar)
-        frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
-        resultado_classificacao = classificar_resultado(inspecao_ok)
-
-    return resultado_classificacao
 
 def main():
     args = src.main_parse()
@@ -180,38 +118,102 @@ def main():
     camera = verificar_conexao_camera(src.DEFAULT_CONFIGFILE["camera"])
     config = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
 
-    ihm = IHM(config["products"])
+    pad_inspec = src.TemplateInspection()
+
+    ihm = src.IHM() # Abre a IHM
+
+    index_modelo = None  # Inicializa o index_modelo vazio
+
+    # Faz a leitura dos modelos no json
+    for index, produto in enumerate(config['products']):
+        print(f"Posição: {index}, Nome do produto: {produto['name']}")
+
+    # Esse while enquanto a tela esta aberta
     while ihm.is_alive():
-        if ihm.get_model_index() is not None and ser.read() == "I":
-            index = ihm.get_model_index()
-            pad_inspec = src.PadInspection(templates_path=f"./templates/{config['products'][index]['name']}")
-            pad_inspec.config = config["products"][index]["pad-inspection"]
 
-            frame = capturar_frame(camera)
-            if frame is None:
-                break
+        # Modificar aqui para a função de modelo vindo da IHM
+        while index_modelo is None:
+            ser.write(b'y')  # Coloca o arduino em standby (inicialmente ja ta): entra na etapa -1 inexistente
 
-            produto_config = config['products'][index]
+            try:
+                index_modelo = int(input("Digite a posição do produto: "))
+                if 0 <= index_modelo < 3:
+                    ser.write(b'x') # Tira o arduino do standby: entra na etapa 0
+                    break
+                else:
+                    print(f"Índice inválido. Digite um número entre 0 e {len(config['products']) - 1}.")
+            except ValueError:
+                print("Por favor, digite um número válido.")
+
+        if index_modelo is not None:
+
+            produto_config = config['products'][index_modelo]
             status = produto_config['status']
 
-            resultado_classificacao = processar_frame(
-                frame,
-                pad_inspec,
-                status=status,
-                pasta="./imagens_processadas",
-                nome_imagem=f"imagem_{produto_config['name']}.jpg"
-            )
+            pad_inspec.config = config["products"][index_modelo]["pad-inspection"]
+            pad_inspec.templates_path = f"./samples/{config['products'][index_modelo]['name']}/templates"
 
-            # Exibe o resultado da classificação se houver
-            if resultado_classificacao is not None:
-                print(f"Resultado da classificação: {resultado_classificacao}")
+            read = ser.read().strip(b"\r\n")
 
-            time.sleep(5)
+            if read == b"p":
+                frame = capturar_frame(camera)
+                timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+                '''
+                Status possíveis:
+                    A: apenas salva o frame (pasta geral > sem_classif)
+                    B: inspeciona e salva o frame (pasta geral > com_classif > OK ou NOK)
+                    C: inspeciona e classifica o frame
+                    D: inspeciona, classifica e salva o frame (pasta teste > OK ou NOK)
+                '''
+
+                if status in ('A'):
+                    salvar_imagem_processada(frame=frame,
+                                             pasta=f"./samples/{config['products'][index_modelo]['name']}/geral/sem_clasif",
+                                             nome_imagem=f"imagem_{produto_config['name']}_{timestamp}.jpg")
+
+                if status in ('B'):
+                    frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+                    if inspecao_ok:
+                        # aqui deve enviar o resultado APROVADO
+                        salvar_imagem_processada(frame=frame,
+                                                 pasta=f"./samples/{config['products'][index_modelo]['name']}/geral/com_clasif/ok",
+                                                 nome_imagem=f"imagem_{produto_config['name']}_{timestamp}.jpg")
+                    else:
+                        # aqui deve enviar o resultado REPROVADO
+                        salvar_imagem_processada(frame=frame,
+                                                 pasta=f"./samples/{config['products'][index_modelo]['name']}/geral/com_clasif/nok",
+                                                 nome_imagem=f"imagem_{produto_config['name']}_{timestamp}.jpg")
+
+                if status in ('C'):
+                    frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+                    classificar_resultado(inspecao_ok)
+                    if inspecao_ok:
+                        # aqui deve enviar o resultado APROVADO
+                    else:
+                        # aqui deve enviar o resultado REPROVADO
+
+
+                if status in ('D'):
+                    frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+                    classificar_resultado(inspecao_ok)
+                    if inspecao_ok:
+                        # aqui deve enviar o resultado APROVADO
+                        ser.write(b'o')
+                        salvar_imagem_processada(frame=frame,
+                                                 pasta=f"./samples/{config['products'][index_modelo]['name']}/teste/ok",
+                                                 nome_imagem=f"imagem_{produto_config['name']}_{timestamp}.jpg")
+                    else:
+                        # aqui deve enviar o resultado REPROVADO
+                        ser.write(b'n')
+                        salvar_imagem_processada(frame=frame,
+                                                 pasta=f"./samples/{config['products'][index_modelo]['name']}/teste/nok",
+                                                 nome_imagem=f"imagem_{produto_config['name']}_{timestamp}.jpg")
+
+            # aqui recebe o aviso de limite reprovadas do arduino
+            # deve chamar a funcao p/ abrir popup
+            if read == b"w":
+                print("enviado aviso de limite excedido p/ tela")
 
 if __name__ == '__main__':
-    config = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
-
-    ihm = IHM(config["products"])
-    ihm.run_ihm()
-    print(f"O botão foi clicado", ihm.get_status_button_continue())
-
+    main()

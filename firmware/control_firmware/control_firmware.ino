@@ -20,6 +20,8 @@ Controle de Versões:
 
 #define OUTPUT_S1 5 // Pino alimentacao solenoide valvula 1 (SAIDA 1)
 #define OUTPUT_S2 6 // Pino alimentacao solenoide valvula 2 (SAIDA 2)
+#define OUTPUT_S3 7 // Pino alimentacao liberar CLP (SAIDA 3)
+
 
 #define OUTPUT_SR 11 // Pino alimentacao torre sinalizacao (RELE) 
 
@@ -40,14 +42,14 @@ void verifica_defeito() {
         if (defeito_v1 == 1 && defeito_v2 == 0) {
           //Delay para saber quando soltar
             digitalWrite(OUTPUT_S1,HIGH);
-            delay(300);
+            delay(1000);
             digitalWrite(OUTPUT_S1,LOW);
             defeito_v1 = 0;
             cont_reprovadas ++;            
         }
         else if (defeito_v1 == 0 && defeito_v2 == 1) {
             digitalWrite(OUTPUT_S2,HIGH);
-            delay(300);
+            delay(1000);
             digitalWrite(OUTPUT_S2,LOW);
             defeito_v2 = 0;
             cont_reprovadas ++;            
@@ -55,7 +57,7 @@ void verifica_defeito() {
         else if (defeito_v1 == 1 && defeito_v2 == 1) {
             digitalWrite(OUTPUT_S1,HIGH);
             digitalWrite(OUTPUT_S2,HIGH);
-            delay(300);
+            delay(1000);
             digitalWrite(OUTPUT_S1,LOW);
             digitalWrite(OUTPUT_S2,LOW);
             defeito_v1 = 0;
@@ -65,53 +67,57 @@ void verifica_defeito() {
         else if (defeito_v1 == 0 && defeito_v2 == 0) {
             cont_reprovadas = 0;
         }
-        if (cont_reprovadas >= 10) { //pode colocar a constante NUMERO_MAXIMO_DE_REPROVACOES aqui
+        if (cont_reprovadas >= 4) { //pode colocar a constante NUMERO_MAXIMO_DE_REPROVACOES aqui
             digitalWrite(OUTPUT_SR, HIGH); //ATIVAR SIRENE
+            Serial.println("w");
+            cont_reprovadas = 0;       
         }
         while (analogRead(INPUT_E2) < 500) {} // Esperar o carro sair da área de checagem para a próxima etapa
-        etapa = 2;
+                etapa = 2;
     }
 }
 
 void primeira_inspecao() {
     if (analogRead(INPUT_E2) < 500) { //voltando para a área de checagem
         delay(500);
-        Serial.println("p"); //primeiro
-        while (analogRead(INPUT_E2) < 500) {} //Espera o carro sair
+        Serial.println("p"); // Envia 'p' pela serial indicando a primeira inspeção
+        
+        while (analogRead(INPUT_E2) < 500) {
+            if (Serial.available() > 0) {
+                char ser = Serial.read();
+                if (ser == 'n') {
+                    defeito_v1 = 1;
+                    break;
+                }
+            }
+        }
+        while (analogRead(INPUT_E2) < 500){}
         etapa = 3;
     }
 }
 
 void segunda_inspecao() {
-    if (analogRead(INPUT_E2) < 500) { 
+    if (analogRead(INPUT_E2) < 500) { //voltando para a área de checagem
         delay(500);
-        Serial.println("s"); //segundo
-        etapa = 4;
-    }
-}
-
-void aguarda_resultado() {
-    while(Serial.available() > 0) {
-        char ser = Serial.read();                          
-        if (ser == 'p') {
-            defeito_v1 = 1;
-            etapa = 0;
-        } else if (ser == 's') {
-            defeito_v2 = 1;
-            etapa = 0;
-        } else if (ser == 'r') { //não tem código que escreve 'r' no serial
-            defeito_v1 = 1;
-            defeito_v2 = 1;
-            etapa = 0;
-        } else if (ser == 'a') {//não tem código que escreve 'a' no serial NÃO FOI CRIADO CASOS PARA ELES
-            etapa = 0;
+        Serial.println("p"); // Envia 'p' pela serial indicando a primeira inspeção
+        
+        while (analogRead(INPUT_E2) < 500) {
+            if (Serial.available() > 0) {
+                char ser = Serial.read();
+                if (ser == 'n') {
+                    defeito_v2 = 1;
+                    break;
+                }
+            }
         }
+        while (analogRead(INPUT_E2) < 500){}
+        etapa = 0;
     }
 }
 
 void reset_sinalizador() {
-    if(analogRead(INPUT_E3) < 500) { //verificar se é menor que 500?? Por que é 500?? 
-        digitalWrite(OUTPUT_SR, LOW); //abaixa a torre de sinalização
+    if(analogRead(INPUT_E3) < 500) {
+        digitalWrite(OUTPUT_SR, LOW);
         cont_reprovadas = 0;
     }
 }
@@ -126,10 +132,12 @@ void setup() {
     
     pinMode(OUTPUT_S1, OUTPUT);
     pinMode(OUTPUT_S2, OUTPUT);
+    pinMode(OUTPUT_S3, OUTPUT);
     pinMode(OUTPUT_SR, OUTPUT);
 
     digitalWrite(OUTPUT_S1, LOW);
     digitalWrite(OUTPUT_S2, LOW);
+    digitalWrite(OUTPUT_S3, HIGH);
     digitalWrite(OUTPUT_SR, LOW);
      
 }
@@ -139,9 +147,11 @@ void loop() {
     while((Serial.available() > 0)){
        char ser = Serial.read(); 
        if(ser == 'x') {
+        digitalWrite(OUTPUT_S3, LOW);
         etapa = 0;
        }
        else if(ser == 'y') { //A interface enviou um modo espera para o arduino
+        digitalWrite(OUTPUT_S3, HIGH);
         etapa = -1;
        }
     }
@@ -152,6 +162,5 @@ void loop() {
     else if (etapa == 1)verifica_defeito(); //verifica os defeitos antes de inspecionar? Não deveria ser o inverso? |Pois ele irá responder para o ciclo anterior|
     else if (etapa == 2)primeira_inspecao();
     else if (etapa == 3)segunda_inspecao();
-    else if (etapa == 4)aguarda_resultado();
- 
+
 }
