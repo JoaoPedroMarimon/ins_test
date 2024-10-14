@@ -3,7 +3,7 @@ from PySide6.QtCore import QObject
 from src.IHM.src.components.communication.Enum.Inspetion_result import InspectionResult
 from src.IHM.src.view.first_screen.main_window import MainWindow
 from src.IHM.src.view.second_screen.second_screen import SecondScreen
-from src.IHM.src.components.communication.ihm_server import IHMServer
+from src.IHM.src.components.communication.ihm_client import IHMClient
 from src.IHM.src.components.communication.controller_order import ControllerOrder
 from src.IHM.src.components.communication.Enum.Inspection_order import InspectionOrder
 
@@ -18,7 +18,7 @@ class ControllerView(QObject):
         self.signals_second_screen()
 
     def __config_server(self):
-        self._server = IHMServer()
+        self._server = IHMClient()
         self._server.add_order_functions(self.get_switch_model, InspectionOrder.GET_MODEL)
         for method in self.get_all_response_function_from_childs():
             self._server.add_order_functions(method,InspectionResult.APROVADO)
