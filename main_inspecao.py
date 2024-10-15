@@ -67,14 +67,11 @@ def capturar_frame(camera):
         return None
     return frame
 
-def salvar_imagem_processada(frame, pasta=".", nome_imagem="imagem_processada.jpg"):
-    """
-    Salva a imagem processada em um diretório especificado.
+def salvar_imagem(frame, nome_produto, posicao, pasta, timestamp):
 
-    :param frame: A imagem processada (frame da câmera).
-    :param pasta: Caminho da pasta onde a imagem será salva (padrão é o diretório atual).
-    :param nome_imagem: Nome do arquivo da imagem (padrão é 'imagem_processada.png').
-    """
+    pasta=f"./samples/{nome_produto}/{posicao}/{pasta}"
+    nome_imagem=f"imagem_{nome_produto}_{timestamp}.jpg"
+
     if not os.path.exists(pasta):
         os.makedirs(pasta)
     caminho_imagem = os.path.join(pasta, nome_imagem)
@@ -120,13 +117,14 @@ def main():
 
     pad_inspec = src.TemplateInspection()
 
-    ihm = src.IHM() # Abre a IHM
-
     index_modelo = None  # Inicializa o index_modelo vazio
 
     # Faz a leitura dos modelos no json
+    # Aqui deve enviar os nomes dos modelos para a IHM
     for index, produto in enumerate(config['products']):
         print(f"Posição: {index}, Nome do produto: {produto['name']}")
+
+    ihm = src.IHM() # Abre a IHM
 
     # Esse while enquanto a tela esta aberta
     while ihm.is_alive():
@@ -148,16 +146,16 @@ def main():
         if index_modelo is not None:
 
             produto_config = config['products'][index_modelo]
-            status = produto_config['status']
-
-            pad_inspec.config = config["products"][index_modelo]["pad-inspection"]
+            pad_inspec.config = produto_config["pad-inspection"]
             pad_inspec.templates_path = f"./samples/{config['products'][index_modelo]['name']}/templates"
+            status = produto_config['status']
 
             read = ser.read().strip(b"\r\n")
 
-            if read == b"p":
+            if read in [b"p", b"s"]:
                 frame = capturar_frame(camera)
                 timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                posicao = "posicao_1" if read == b"p" else "posicao_2"
 
                 '''
                 Status possíveis:
@@ -168,22 +166,12 @@ def main():
                 '''
 
                 if status in ('A'):
-                    salvar_imagem_processada(frame=frame,
-                                             pasta=f"./samples/{config['products'][index_modelo]['name']}/posicao_1/geral/sem_clasif",
-                                             nome_imagem=f"imagem_{produto_config['name']}_{timestamp}.jpg")
+                    salvar_imagem(frame, produto_config['name'], posicao, "geral/sem_clasif", timestamp)
 
                 if status in ('B'):
                     frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
-                    if inspecao_ok:
-                        # aqui deve enviar o resultado APROVADO
-                        salvar_imagem_processada(frame=frame,
-                                                 pasta=f"./samples/{config['products'][index_modelo]['name']}/posicao_1/geral/com_clasif/ok",
-                                                 nome_imagem=f"imagem_{produto_config['name']}_{timestamp}.jpg")
-                    else:
-                        # aqui deve enviar o resultado REPROVADO
-                        salvar_imagem_processada(frame=frame,
-                                                 pasta=f"./samples/{config['products'][index_modelo]['name']}/posicao_1/geral/com_clasif/nok",
-                                                 nome_imagem=f"imagem_{produto_config['name']}_{timestamp}.jpg")
+                    pasta = f"geral/com_clasif/ok" if inspecao_ok else f"geral/com_clasif/nok"
+                    salvar_imagem(frame, produto_config['name'], posicao, pasta, timestamp)
 
                 if status in ('C'):
                     frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
@@ -195,79 +183,13 @@ def main():
                         print("REPROVADO enviado")
                         # aqui deve enviar o resultado REPROVADO
 
-
                 if status in ('D'):
                     frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
                     classificar_resultado(inspecao_ok)
-                    if inspecao_ok:
-                        # aqui deve enviar o resultado APROVADO
-                        ser.write(b'o')
-                        salvar_imagem_processada(frame=frame,
-                                                 pasta=f"./samples/{config['products'][index_modelo]['name']}/posicao_1/teste/ok",
-                                                 nome_imagem=f"imagem_{produto_config['name']}_{timestamp}.jpg")
-                    else:
-                        # aqui deve enviar o resultado REPROVADO
-                        ser.write(b'n')
-                        salvar_imagem_processada(frame=frame,
-                                                 pasta=f"./samples/{config['products'][index_modelo]['name']}/posicao_1/teste/nok",
-                                                 nome_imagem=f"imagem_{produto_config['name']}_{timestamp}.jpg")
-
-            if read == b"s":
-                frame = capturar_frame(camera)
-                timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-
-                '''
-                Status possíveis:
-                    A: apenas salva o frame (pasta geral > sem_classif)
-                    B: inspeciona e salva o frame (pasta geral > com_classif > OK ou NOK)
-                    C: inspeciona e classifica o frame
-                    D: inspeciona, classifica e salva o frame (pasta teste > OK ou NOK)
-                '''
-
-                if status in ('A'):
-                    salvar_imagem_processada(frame=frame,
-                                             pasta=f"./samples/{config['products'][index_modelo]['name']}/posicao_2/geral/sem_clasif",
-                                             nome_imagem=f"imagem_{produto_config['name']}_{timestamp}.jpg")
-
-                if status in ('B'):
-                    frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
-                    if inspecao_ok:
-                        # aqui deve enviar o resultado APROVADO
-                        salvar_imagem_processada(frame=frame,
-                                                 pasta=f"./samples/{config['products'][index_modelo]['name']}/posicao_2/geral/com_clasif/ok",
-                                                 nome_imagem=f"imagem_{produto_config['name']}_{timestamp}.jpg")
-                    else:
-                        # aqui deve enviar o resultado REPROVADO
-                        salvar_imagem_processada(frame=frame,
-                                                 pasta=f"./samples/{config['products'][index_modelo]['name']}/posicao_2/geral/com_clasif/nok",
-                                                 nome_imagem=f"imagem_{produto_config['name']}_{timestamp}.jpg")
-
-                if status in ('C'):
-                    frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
-                    classificar_resultado(inspecao_ok)
-                    if inspecao_ok:
-                        print("APROVADO enviado")
-                        # aqui deve enviar o resultado APROVADO
-                    else:
-                        print("REPROVADO enviado")
-                        # aqui deve enviar o resultado REPROVADO
-
-
-                if status in ('D'):
-                    frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
-                    classificar_resultado(inspecao_ok)
-                    if inspecao_ok:
-                        # aqui deve enviar o resultado APROVADO
-                        ser.write(b'o')
-                        salvar_imagem_processada(frame=frame,
-                                                 pasta=f"./samples/{config['products'][index_modelo]['name']}/posicao_2/teste/ok",
-                                                 nome_imagem=f"imagem_{produto_config['name']}_{timestamp}.jpg")
-                    else:
-                        # aqui deve enviar o resultado REPROVADO
-                        ser.write(b'n')
-                        salvar_imagem_processada(frame=frame,
-                                                 pasta=f"./samples/{config['products'][index_modelo]['name']}/posicao_2/teste/nok",
-                                                 nome_imagem=f"imagem_{produto_config['name']}_{timestamp}.jpg")
+                    pasta = "teste/ok" if inspecao_ok else "teste/nok"
+                    salvar_imagem(frame, produto_config['name'], posicao, pasta, timestamp)
+                    # aqui envia o resultado 'o' para aprovado e 'n' para reprovado
+                    ser.write(b'o' if inspecao_ok else b'n')
 
             # aqui recebe o aviso de limite reprovadas do arduino
             # deve chamar a funcao p/ abrir popup

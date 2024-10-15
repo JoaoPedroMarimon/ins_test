@@ -94,7 +94,7 @@ void primeira_inspecao() {
             if (Serial.available() > 0) {
                 char ser = Serial.read();
                 if (ser == 'n') {
-                  defeito_v1 = 1; // Define defeito_v1 se INPUT_E4 > 500
+                  defeito_v1 = 1;
                   break;
                 }
             }
@@ -128,10 +128,7 @@ void segunda_inspecao() {
             }
         }
 
-        // Espera até que INPUT_E2 volte ao valor maior que 500
         while (analogRead(INPUT_E2) < 500) {}
-
-        // Atualiza a etapa após a leitura
         etapa = 0;
     }
 }
