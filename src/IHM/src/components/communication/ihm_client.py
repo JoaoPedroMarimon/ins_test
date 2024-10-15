@@ -1,0 +1,30 @@
+from abc import ABC
+from typing import Dict, Callable, Any
+
+from PySide6.QtCore import QObject, Signal
+from src.IHM.src.components.communication.interfaces.qt_ipc_client import QtIPCClient
+from src.IHM.src.components.communication.Enum.Inspetion_result import InspectionResult
+from src.IHM.src.components.communication.packet.packet import Packet
+from src.IHM.src.components.communication.packet.packet import PacketType
+from src.IHM.src.components.communication.packet.utils import BASE_PACKET_SCHEMA
+from src.IHM.src.components.communication.message_controller import MessageController
+
+
+class IHMClient(QtIPCClient, ABC):
+    OnReceiveResult = Signal(InspectionResult)
+    def __init__(self):
+        super().__init__(address="/tmp/IHM",packet_schema=BASE_PACKET_SCHEMA)
+        self.OnReceiveResult.connect(self.react_packet)
+        super().start()
+
+    def send_model_index(self, model: int) -> None:
+        self._send_packet(Packet("0",PacketType.REQUEST,"get_model", {"model":model}))
+
+    def react_packet(self, packet: Packet) -> None:
+        match packet.message:
+            case "inspection":
+                self.OnReceiveResult.emit(MessageController.convert_result_to_enum(packet.body))
+
+
+    def close(self):
+        self.socket.close()
