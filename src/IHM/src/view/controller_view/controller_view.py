@@ -16,7 +16,6 @@ class ControllerView(QObject):
         self.__config_server()
         self.signals_first_screen()
         self.signals_second_screen()
-
     def __config_server(self):
         self._server = IHMServer()
         self._server.add_order_functions(self.get_switch_model, InspectionOrder.GET_MODEL)

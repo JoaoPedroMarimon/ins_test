@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 from .serial_connection import SerialController
 from . import environment as env
 from . import utils
-from .inspection_designer.inspection_designer import inspection
+#from .inspection_designer.inspection_designer import inspection
 
 
 class NotAProductError(Exception):
