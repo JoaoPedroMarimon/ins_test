@@ -34,7 +34,7 @@ class SecondScreen(QMainWindow, Ui_MainWindow):
         self.setVisible(False)
         self.OpenFirstScreen.emit()
 
-    def get_on_response_functions(self) -> list:
+    def get_on_inspection_functions(self) -> list:
         response_methods = [self.enum_to_history, self.mostrar_aprovado_reprovado]
         return response_methods
 

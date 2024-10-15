@@ -42,6 +42,7 @@ class ControllerView(QObject):
 
     def switch_model_to_second_screen(self, switch_model: str) -> None:
         self.second_screen.set_name_switch(switch_model)
+        self._server.send_model_index(self.get_model_index())
 
     def get_model_index(self) -> int | None:
         model_name = self.get_switch_model()
