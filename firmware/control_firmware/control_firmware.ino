@@ -17,6 +17,8 @@ Controle de Versões:
 #define INPUT_E1 A1 // Pino do sinal do clp inicio/fim para zerar contador etapas do processo (ENTRADA 1 - 24v)
 #define INPUT_E2 A0 // Pino do sinal do clp sensor carro recuado (ENTRADA 2 - 24v)
 #define INPUT_E3 A2 // Pino do botao reset do sinalizador (ENTRADA 3 - 12v)
+#define INPUT_E4 A3 // Pino do sensor de posição do gabarito (ENTRADA 4 - 12v)
+
 
 #define OUTPUT_S1 5 // Pino alimentacao solenoide valvula 1 (SAIDA 1)
 #define OUTPUT_S2 6 // Pino alimentacao solenoide valvula 2 (SAIDA 2)
@@ -78,42 +80,63 @@ void verifica_defeito() {
 }
 
 void primeira_inspecao() {
-    if (analogRead(INPUT_E2) < 500) { //voltando para a área de checagem
+    if (analogRead(INPUT_E2) < 500) { // Voltando para a área de checagem
         delay(500);
-        Serial.println("p"); // Envia 'p' pela serial indicando a primeira inspeção
-        
+
+        if (analogRead(INPUT_E4) > 500) {
+            Serial.println("p");
+        } else {
+            Serial.println("s");
+        }
+
+        // Mantém a lógica de aguardar até que INPUT_E2 saia da condição < 500
         while (analogRead(INPUT_E2) < 500) {
             if (Serial.available() > 0) {
                 char ser = Serial.read();
                 if (ser == 'n') {
-                    defeito_v1 = 1;
-                    break;
+                  defeito_v1 = 1; // Define defeito_v1 se INPUT_E4 > 500
+                  break;
                 }
             }
         }
-        while (analogRead(INPUT_E2) < 500){}
+        
+        while (analogRead(INPUT_E2) < 500) {}
         etapa = 3;
     }
 }
 
+
+
 void segunda_inspecao() {
-    if (analogRead(INPUT_E2) < 500) { //voltando para a área de checagem
+    if (analogRead(INPUT_E2) < 500) { // Voltando para a área de checagem
         delay(500);
-        Serial.println("p"); // Envia 'p' pela serial indicando a primeira inspeção
-        
+
+        if (analogRead(INPUT_E4) > 500) {
+            Serial.println("p");
+        } else {
+            Serial.println("s");
+        }
+
+        // Mantém a lógica de aguardar até que INPUT_E2 saia da condição < 500
         while (analogRead(INPUT_E2) < 500) {
             if (Serial.available() > 0) {
                 char ser = Serial.read();
                 if (ser == 'n') {
-                    defeito_v2 = 1;
-                    break;
+                  defeito_v2 = 1;
+                  break;
                 }
             }
         }
-        while (analogRead(INPUT_E2) < 500){}
+
+        // Espera até que INPUT_E2 volte ao valor maior que 500
+        while (analogRead(INPUT_E2) < 500) {}
+
+        // Atualiza a etapa após a leitura
         etapa = 0;
     }
 }
+
+
 
 void reset_sinalizador() {
     if(analogRead(INPUT_E3) < 500) {
@@ -129,6 +152,7 @@ void setup() {
     pinMode(INPUT_E1, INPUT);
     pinMode(INPUT_E2, INPUT);
     pinMode(INPUT_E3, INPUT);
+    pinMode(INPUT_E4, INPUT);
     
     pinMode(OUTPUT_S1, OUTPUT);
     pinMode(OUTPUT_S2, OUTPUT);
