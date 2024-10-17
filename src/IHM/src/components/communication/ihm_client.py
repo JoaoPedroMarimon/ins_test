@@ -17,9 +17,11 @@ class IHMClient(QtIPCClient, ABC):
         self.OnReceiveResult.connect(self.react_packet)
         super().start()
 
-    def send_model_index(self, model: int) -> None:
-        self._send_packet(Packet("0",PacketType.REQUEST,"get_model", {"model":model}))
+    def _on_unexpected_error(self, e):
+        print(e)
 
+    def send_model_index(self, model: int) -> None:
+        self._send_packet(Packet("0",PacketType.REQUEST,message="model", body={"model":model}))
     def react_packet(self, packet: Packet) -> None:
         match packet.message:
             case "inspection":

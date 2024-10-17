@@ -8,7 +8,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     modelSig = Signal(str)
     OpenSecondScreen = Signal()
     OnClose = Signal()
-    def __init__(self, product_json:dict):
+    def __init__(self, product_json:list):
         super(MainWindow, self).__init__()
         self.setupUi(self)
         # Executa uma função lambda(anônima) em linha, fazendo com que chame a função de mostrar a tela passando o modelo
