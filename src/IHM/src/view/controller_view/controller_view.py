@@ -1,3 +1,5 @@
+from operator import index
+
 from PySide6.QtCore import QObject
 
 from src.IHM.src.view.first_screen.main_window import MainWindow
@@ -6,7 +8,7 @@ from src.IHM.src.components.communication.ihm_client import IHMClient
 
 
 class ControllerView(QObject):
-    def __init__(self,product_json:dict):
+    def __init__(self,product_json:list):
         super().__init__()
         self.__product_json = product_json
         self.first_screen = MainWindow(product_json=product_json)
@@ -48,7 +50,8 @@ class ControllerView(QObject):
         model_name = self.get_switch_model()
         if model_name == 'MODELO SWITCH':
             return None
-        return list(self.__product_json.keys()).index(model_name)
+        index = [model_index for model_index, model in enumerate(self.__product_json) if model_name in model.values()].pop()
+        return index
 
     def get_switch_model(self) -> str:
         return self.second_screen.get_name_switch()
