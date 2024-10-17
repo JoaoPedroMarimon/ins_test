@@ -6,7 +6,7 @@ import src
 
 from datetime import datetime
 from logging import exception
-
+from src import IHM
 from src import Interface
 from src.IHM.src.components.communication.ihm_client import IHMClient
 

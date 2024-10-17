@@ -7,7 +7,7 @@ from .environment import (DEFAULT_CONFIGFILE, CONFIGFILE_PATHNAME,
 
 
 from .IHM.interface import Interface
-#from .IHM.hmi_receiver import HMIClient
+from .IHM.ihm import IHM
 #from .inspection_designer.inspection_designer.inspection import PadInspection
 from .logger import init_logging
 #from .messenger.messenger import QueueMessenger
