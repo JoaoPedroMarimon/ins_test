@@ -8,14 +8,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     modelSig = Signal(str)
     OpenSecondScreen = Signal()
     OnClose = Signal()
-    def __init__(self):
+    def __init__(self, product_json:list):
         super(MainWindow, self).__init__()
         self.setupUi(self)
         # Executa uma função lambda(anônima) em linha, fazendo com que chame a função de mostrar a tela passando o modelo
-        self.button_model_sf800.clicked.connect(lambda: self.set_model_switch('SF 800 Q+'))
-        self.button_model_sg800.clicked.connect(lambda: self.set_model_switch('SG 800 Q+'))
-        self.button_model_s1108f.clicked.connect(lambda: self.set_model_switch('S 1108 F'))
-        self.button_model_s1108g.clicked.connect(lambda: self.set_model_switch('S 1108 G'))
+        self.button_model_sf800.setText(product_json[0]['name'])
+        self.button_model_sg800.setText(product_json[1]['name'])
+        self.button_model_s1108f.setText(product_json[2]['name'])
+        self.button_model_s1108g.setText("Sobra")
+        self.button_model_sf800.clicked.connect(lambda: self.set_model_switch(product_json[0]['name']))
+        self.button_model_sg800.clicked.connect(lambda: self.set_model_switch(product_json[1]['name']))
+        self.button_model_s1108f.clicked.connect(lambda: self.set_model_switch(product_json[2]['name']))
+        self.button_model_s1108g.clicked.connect(lambda: self.set_model_switch("Sobra"))
 
     def closeEvent(self, event):
         self.OnClose.emit()
