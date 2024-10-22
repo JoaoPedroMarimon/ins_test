@@ -21,7 +21,7 @@ class IHMClient(QtIPCClient, ABC):
         print(e)
 
     def send_model_index(self, model: int) -> None:
-        self._send_packet(Packet("0",PacketType.REQUEST,message="model", body={"model":model}))
+        self._send_packet(Packet("0",PacketType.REQUEST,message="get_model", body={"model":model}))
     def react_packet(self, packet: Packet) -> None:
         match packet.message:
             case "inspection":
