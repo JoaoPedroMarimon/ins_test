@@ -1,6 +1,8 @@
 import logging
 import os
 import time
+
+import cv2
 import serial
 import src
 
@@ -9,6 +11,7 @@ from logging import exception
 from src import IHM
 from src import Interface
 from src.IHM.src.components.communication.ihm_client import IHMClient
+from src.IHM.src.components.video_preview.videoqthread import get_rtsp_url
 
 
 def verificar_conexao_serial(args):
@@ -123,4 +126,16 @@ def main():
             print("Opção inválida")
 
 if __name__ == '__main__':
-    main()
+    config: dict = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
+
+    ihm = IHM(config["products"])
+    ihm.run_ihm()
+    video = cv2.VideoCapture(get_rtsp_url("192.168.1.108","admin","admin123",subtype=0))
+    while video.isOpened():
+
+        if cv2.waitKey(20) & 0xFF == ord('d'):
+            break
+        _, frame = video.read()
+        cv2.imshow('tela teste',frame)
+    cv2.destroyAllWindows()
+    # main()
