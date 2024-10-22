@@ -127,16 +127,7 @@ def main():
 
 if __name__ == '__main__':
     config: dict = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
-
     ihm = IHM(config["products"])
     ihm.run_ihm()
-    #----------------- código do segundo objeto da câmera --------------------------
-    # video = cv2.VideoCapture(get_rtsp_url("192.168.1.108","admin","admin123",subtype=0))
-    # while video.isOpened():
-    #
-    #     if cv2.waitKey(20) & 0xFF == ord('d'):
-    #         break
-    #     _, frame = video.read()
-    #     cv2.imshow('tela teste',frame)
-    # cv2.destroyAllWindows()
     main()
+
