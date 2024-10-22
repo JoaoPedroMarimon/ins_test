@@ -22,7 +22,7 @@ class VideoPreview(QWidget):
 
     def _creating_instances(self):
         self.video_thread = None
-        self._camera_source = get_rtsp_url("10.0.0.101","admin","admin123")
+        self._camera_source = get_rtsp_url("192.168.1.108","admin","admin123",subtype=1)
         self._size: tuple[int, int] = (self.parent().size().width(), self.parent().size().height())
         self.photo_viewer = PhotoViewer(self)
 

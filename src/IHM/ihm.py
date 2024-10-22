@@ -19,9 +19,9 @@ class IHM(Singleton,Interface):
         super()._run_interface()
 
     def is_alive(self):
-        if self.thread is None:
+        if self._thread is None:
             return False
-        return self.thread.is_alive()
+        return self._thread.is_alive()
 
     def get_model_index(self) -> int | None:
         return self._server.get_model_index()
