@@ -15,6 +15,8 @@ from serial.tools.list_ports import comports
 
 from .logger import handle_exception
 
+PACKET_LENGTH = 4
+
 
 def load_json_configfile(file_path: str, default: dict | list = None) -> dict | list:
     if not os.path.exists(file_path):
