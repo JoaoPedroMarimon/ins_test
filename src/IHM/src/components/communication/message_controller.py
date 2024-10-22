@@ -6,10 +6,10 @@ class MessageController:
     @classmethod
     def convert_result_to_enum(cls, req) -> InspectionResult:
         match req:
-            case "aprovado":
+            case "approved":
                 return InspectionResult.APROVADO
-            case "reprovado":
+            case "reproved":
                 return InspectionResult.REPROVADO
-            case "sem_inspecao":
+            case "no_inspection":
                 return InspectionResult.NAO_INSPECIONADO
 
