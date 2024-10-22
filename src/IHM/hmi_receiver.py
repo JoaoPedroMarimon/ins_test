@@ -10,7 +10,8 @@ class HMIReceiver(IPCServer, ABC):
         super().__init__("/tmp/IHM",packet_schema=BASE_PACKET_SCHEMA)
         self._receive_packet_handler_thread = None
         self._ihm_status = {
-            'model': None
+            'model': None,
+            'button': None
         }
     # def _read_packet(self):
     #     packet_struct_length = self._client.recv(PACKET_LENGTH)
@@ -31,14 +32,16 @@ class HMIReceiver(IPCServer, ABC):
                 case "model":
                     self._ihm_status["model"] = packet.body['model']
                     break
+                case "button_continue":
+                    self._ihm_status["button"] = packet.body['status']
 
     def get_model_index(self) -> int | None:
         return self._ihm_status['model']
+
+    def get_button_continue_stats(self):
+        return self._ihm_status['button']
+
     def start(self):
         super().start()
         self._receive_packet_handler_thread = Thread(target=self.packet_receiver,daemon=True)
         self._receive_packet_handler_thread.start()
-
-
-
-
