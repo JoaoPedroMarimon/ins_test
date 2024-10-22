@@ -16,7 +16,7 @@ class Interface:
     _thread = None
     _client = None
 
-    def __init__(self,product_json:dict):
+    def __init__(self,product_json:list):
         if self._thread is None:
             self.__config_thread(product_json)
 
@@ -27,7 +27,7 @@ class Interface:
         self.worker = self._run_ihm
         self._thread = Process(target=self.worker,args=[product_json])
 
-    def _run_ihm(self,json_produts:dict):
+    def _run_ihm(self,json_produts:list):
         app = QApplication()
         controller_view = ControllerView(json_produts)
         controller_view.show()

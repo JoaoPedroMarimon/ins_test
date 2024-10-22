@@ -17,11 +17,15 @@ class IHMClient(QtIPCClient, ABC):
         self.OnReceiveResult.connect(self.react_packet)
         super().start()
 
-    def send_model_index(self, model: int) -> None:
-        self._send_packet(Packet("0",PacketType.REQUEST,"get_model", {"model":model}))
+    def _on_unexpected_error(self, e):
+        print(e)
+
 
     def send_status_button_continue(self, status: bool) -> None:
         self._send_packet(Packet("1",PacketType.REQUEST,"button_continue", {"status": status}))
+
+    def send_model_index(self, model: int) -> None:
+        self._send_packet(Packet("0",PacketType.REQUEST,message="get_model", body={"model":model}))
 
     def react_packet(self, packet: Packet) -> None:
         match packet.message:
