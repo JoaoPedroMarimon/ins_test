@@ -54,11 +54,13 @@ def main_parse():
     add_parser = subparser.add_parser("add", help="Adiciona um novo produto no arquivo.")
     add_parser.add_argument("name", type=str, help="Nome do produto, sem caracteres especiais.")
     add_parser.add_argument("code", type=str, help="Código do produto.")
+    add_parser.add_argument("status", type=str, help="Status da inspecao.")
 
     edit_parser = subparser.add_parser("edit", help="Edita um produto existente no arquivo.")
     group = edit_parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-n", "--name", type=str, help="Nome de um produto existente no arquivo.")
     group.add_argument("-c", "--code", type=str, help="Código de um produto existente no arquivo.")
+    group.add_argument("-s", "--status", type=str, help="Status da inspecao.")
 
     del_parser = subparser.add_parser("del", help='Apaga um produto existente do arquivo, além de suas pastas.')
     group = del_parser.add_mutually_exclusive_group(required=True)
@@ -114,6 +116,7 @@ def execute_parse(args) -> None:
     if args.subparser == "add":
         product_data = {"name": args.name.upper().replace(" ", ""),
                         "code": args.code,
+                        "status": args.status.upper().replace(" ", ""),
                         "pad-inspection": {"active": True, "classes": []}}
 
         config["products"].append(product_data)
