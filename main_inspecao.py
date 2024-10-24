@@ -164,35 +164,33 @@ def main():
     camera = verificar_conexao_camera(src.DEFAULT_CONFIGFILE["camera"])
     config = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
 
-    ihm = src.IHM()
-    print(ihm.modelo())
+    ihm = IHM(config["products"])
+    while ihm.is_alive():
+        if ihm.get_model_index() is not None and ser.read() == "I":
+            index = ihm.get_model_index()
+            pad_inspec = src.PadInspection(templates_path=f"./templates/{config['products'][index]['name']}")
+            pad_inspec.config = config["products"][index]["pad-inspection"]
 
+            frame = capturar_frame(camera)
+            if frame is None:
+                break
 
+            produto_config = config['products'][index]
+            status = produto_config['status']
 
-    pad_inspec = src.PadInspection(templates_path=f"./templates/{config['products'][0]['name']}")
-    pad_inspec.config = config["products"][0]["pad-inspection"]
+            resultado_classificacao = processar_frame(
+                frame,
+                pad_inspec,
+                status=status,
+                pasta="./imagens_processadas",
+                nome_imagem=f"imagem_{produto_config['name']}.jpg"
+            )
 
-    while True:
-        frame = capturar_frame(camera)
-        if frame is None:
-            break
+            # Exibe o resultado da classificação se houver
+            if resultado_classificacao is not None:
+                print(f"Resultado da classificação: {resultado_classificacao}")
 
-        produto_config = config['products'][0]
-        status = produto_config['status']
-
-        resultado_classificacao = processar_frame(
-            frame,
-            pad_inspec,
-            status=status,
-            pasta="./imagens_processadas",
-            nome_imagem=f"imagem_{produto_config['name']}.jpg"
-        )
-
-        # Exibe o resultado da classificação se houver
-        if resultado_classificacao is not None:
-            print(f"Resultado da classificação: {resultado_classificacao}")
-
-        time.sleep(5)
+            time.sleep(5)
 
 if __name__ == '__main__':
     config: dict = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
@@ -201,5 +199,5 @@ if __name__ == '__main__':
     while ihm.is_alive():
         if ihm.get_model_index():
             print(f"{ihm.get_model_index()}")
-    # main()
+    main()
 
