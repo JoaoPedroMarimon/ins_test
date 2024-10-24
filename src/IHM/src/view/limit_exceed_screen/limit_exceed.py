@@ -8,12 +8,12 @@ class LimitExceed(QDialog, Ui_Dialog):
     def __init__(self):
         super(LimitExceed, self).__init__()
         self.setupUi(self)
-        self.button_continue.clicked.connect(self.on_continue_clicked)
         self.button_clicked = False
+        self.button_continue.clicked.connect(self.on_continue_clicked)
 
     def on_continue_clicked(self):
-        self.IsClicked.emit()
         self.button_clicked = True
+        self.IsClicked.emit()
         self.setVisible(False)
 
     def has_user_clicked_continue(self):
