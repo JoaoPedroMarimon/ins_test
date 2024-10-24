@@ -12,6 +12,7 @@ from src.IHM.src.components.communication.message_controller import MessageContr
 
 class IHMClient(QtIPCClient, ABC):
     OnReceiveResult = Signal(InspectionResult)
+    OpenLimitExceed = Signal()
     def __init__(self):
         super().__init__(address="/tmp/IHM",packet_schema=BASE_PACKET_SCHEMA)
         self.packetReceivedSig.connect(self.react_packet)
@@ -32,6 +33,8 @@ class IHMClient(QtIPCClient, ABC):
         match packet.message:
             case "inspection":
                 self.OnReceiveResult.emit(MessageController.convert_result_to_enum(packet.body["result"]))
+            case "limit_exceed":
+                self.OpenLimitExceed.emit()
 
 
     def close(self):
