@@ -131,6 +131,8 @@ if __name__ == '__main__':
     ihm = IHM(config["products"])
     ihm.run_ihm()
     time.sleep(1)
-    ihm.open()
+    ihm.open_limit_exceed_screen()
+    time.sleep(1)
+    print(f"O BOTÃO FOI CLICADO?", ihm.get_status_button_continue())
     main()
 

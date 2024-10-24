@@ -26,6 +26,8 @@ class IHM(Singleton,Interface):
     def get_model_index(self) -> int | None:
         return self._server.get_model_index()
 
+    def get_status_button_continue(self):
+        return self._server.get_status_button_continue()
 
     def open_limit_exceed_screen(self):
         self._server.open_limit_exceed_screen()

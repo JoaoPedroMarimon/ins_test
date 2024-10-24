@@ -44,7 +44,7 @@ class HMIReceiver(IPCServer, ABC):
     def get_model_index(self) -> int | None:
         return self._ihm_status['model']
 
-    def get_button_continue_stats(self):
+    def get_status_button_continue(self):
         return self._ihm_status['button']
 
     def open_limit_exceed_screen(self):
