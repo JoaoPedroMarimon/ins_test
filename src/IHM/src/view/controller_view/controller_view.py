@@ -23,8 +23,7 @@ class ControllerView(QObject):
         self._server = IHMClient()
         self._server.OnReceiveResult.connect(self.second_screen.enum_to_history)
         self._server.OnReceiveResult.connect(self.second_screen.mostrar_aprovado_reprovado)
-
-
+        self._server.OpenLimitExceed.connect(self.open_limit_exceed)
 
     def show(self):
         self.first_screen.show()
@@ -46,6 +45,9 @@ class ControllerView(QObject):
 
     def open_second_screen(self) -> None:
         self.second_screen.setVisible(True)
+
+    def open_limit_exceed(self):
+        self.limit_screen.open_limit_exceed_screen()
 
     def switch_model_to_second_screen(self, switch_model: str) -> None:
         self.second_screen.set_name_switch(switch_model)

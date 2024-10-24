@@ -5,7 +5,6 @@ import time
 import cv2
 import serial
 import src
-import cv2
 
 from datetime import datetime
 from logging import exception
@@ -60,6 +59,23 @@ def verificar_conexao_camera(config_camera):
             camera = None  # Garante que ele tente novamente no loop
             time.sleep(3)  # Espera 3 segundos antes de tentar novamente
     return camera
+def tentar_enviar_reproved(ser, args):
+    """
+    Função que verifica a conexão serial antes de enviar ser.reproved().
+    Caso a conexão seja perdida, a função tentará reconectar e só então enviar o comando.
+    """
+    while True:
+        # Verifica se a conexão serial está ativa
+        if ser is None:
+            print("Conexão serial perdida. Tentando reconectar...")
+            ser = tentar_conectar_serial(args)  # Tenta reconectar
+        try:
+            ser.reproved()  # Envia o comando após reconectar
+            print("Comando 'reproved' enviado com sucesso.")
+            break  # Sai do loop se o comando for enviado com sucesso
+        except Exception as e:
+            print(f"Erro ao enviar reproved: {e}. Verificando conexão serial...")
+            ser = None  # Marca a conexão como perdida e tenta reconectar
 
 def capturar_frame(camera):
     """
@@ -193,11 +209,6 @@ def main():
             time.sleep(5)
 
 if __name__ == '__main__':
-    config: dict = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
-    ihm = IHM(config["products"])
-    ihm.run_ihm()
-    while ihm.is_alive():
-        if ihm.get_model_index():
-            print(f"{ihm.get_model_index()}")
+
     main()
 
