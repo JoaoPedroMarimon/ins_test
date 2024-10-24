@@ -130,7 +130,9 @@ if __name__ == '__main__':
     config: dict = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
     ihm = IHM(config["products"])
     ihm.run_ihm()
-    time.sleep(2)
+    time.sleep(1)
     ihm.open_limit_exceed_screen()
+    time.sleep(1)
+    print(f"O BOTÃO FOI CLICADO?", ihm.get_status_button_continue())
     main()
 
