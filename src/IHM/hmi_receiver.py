@@ -47,6 +47,9 @@ class HMIReceiver(IPCServer, ABC):
     def get_button_continue_stats(self):
         return self._ihm_status['button']
 
+    def open_limit_exceed_screen(self):
+        self._send_packet(Packet("0", PacketType.REQUEST, "limit_exceed", {}))
+
     def start(self):
         super().start()
         self._receive_packet_handler_thread = Thread(target=self.packet_receiver,daemon=True)

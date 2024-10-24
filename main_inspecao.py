@@ -10,6 +10,7 @@ from datetime import datetime
 from logging import exception
 from src import IHM
 from src import Interface
+from src.IHM.hmi_receiver import HMIReceiver
 from src.IHM.src.components.communication.ihm_client import IHMClient
 from src.IHM.src.components.video_preview.videoqthread import get_rtsp_url
 
@@ -129,5 +130,7 @@ if __name__ == '__main__':
     config: dict = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
     ihm = IHM(config["products"])
     ihm.run_ihm()
+    time.sleep(1)
+    ihm.open()
     main()
 

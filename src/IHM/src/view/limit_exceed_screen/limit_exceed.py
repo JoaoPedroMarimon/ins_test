@@ -1,6 +1,5 @@
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QDialog
-
 from src.IHM.src.view.limit_exceed_screen.limit_exceed_screen_ui import Ui_Dialog
 
 class LimitExceed(QDialog, Ui_Dialog):
@@ -9,7 +8,6 @@ class LimitExceed(QDialog, Ui_Dialog):
     def __init__(self):
         super(LimitExceed, self).__init__()
         self.setupUi(self)
-        self.setVisible(True)
         self.button_continue.clicked.connect(self.on_continue_clicked)
         self.button_clicked = False
 

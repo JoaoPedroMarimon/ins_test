@@ -1,4 +1,4 @@
-from hmi_receiver import HMIReceiver
+from src.IHM.hmi_receiver import HMIReceiver
 from .interface import Interface
 
 
@@ -25,4 +25,8 @@ class IHM(Singleton,Interface):
 
     def get_model_index(self) -> int | None:
         return self._server.get_model_index()
+
+
+    def open_limit_exceed_screen(self):
+        self._server.open_limit_exceed_screen()
 
