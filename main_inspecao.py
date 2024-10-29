@@ -183,6 +183,7 @@ def main():
                     else:
                         print("REPROVADO enviado")
                         # aqui deve enviar o resultado REPROVADO
+                        ser.write(b'o' if inspecao_ok else b'n')
 
                 if status in ('D'):
                     frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)

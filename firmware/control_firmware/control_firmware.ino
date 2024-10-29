@@ -69,7 +69,7 @@ void verifica_defeito() {
         else if (defeito_v1 == 0 && defeito_v2 == 0) {
             cont_reprovadas = 0;
         }
-        if (cont_reprovadas >= 4) { //pode colocar a constante NUMERO_MAXIMO_DE_REPROVACOES aqui
+        if (cont_reprovadas >= 2) { //pode colocar a constante NUMERO_MAXIMO_DE_REPROVACOES aqui
             digitalWrite(OUTPUT_SR, HIGH); //ATIVAR SIRENE
             Serial.println("w");
             cont_reprovadas = 0;       
@@ -162,7 +162,7 @@ void segunda_inspecao() {
         // Aguarda até que INPUT_E2 saia da condição < 500
         while (analogRead(INPUT_E2) < 500) {}
 
-        etapa = 3;
+        etapa = 0;
     }
 }
 
