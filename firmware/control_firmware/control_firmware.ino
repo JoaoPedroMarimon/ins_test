@@ -89,22 +89,38 @@ void primeira_inspecao() {
             Serial.println("s");
         }
 
+        // Variável para controlar o tempo
+        unsigned long startTime = millis();
+        bool respostaRecebida = false;
+
         // Mantém a lógica de aguardar até que INPUT_E2 saia da condição < 500
         while (analogRead(INPUT_E2) < 500) {
             if (Serial.available() > 0) {
                 char ser = Serial.read();
                 if (ser == 'n') {
-                  defeito_v1 = 1;
-                  break;
+                    defeito_v1 = 1;
+                    respostaRecebida = true;
+                    break;
+                } else if (ser == 'o') {
+                    respostaRecebida = true;
+                    break;
                 }
             }
+
+            // Verifica se se passaram 5 segundos sem resposta
+            if (millis() - startTime > 2000) {
+                digitalWrite(OUTPUT_SR, HIGH); // Aciona SR
+                respostaRecebida = true;
+                break;
+            }
         }
-        
+
+        // Aguarda até que INPUT_E2 saia da condição < 500
         while (analogRead(INPUT_E2) < 500) {}
+
         etapa = 3;
     }
 }
-
 
 
 void segunda_inspecao() {
@@ -117,22 +133,38 @@ void segunda_inspecao() {
             Serial.println("s");
         }
 
+        // Variável para controlar o tempo
+        unsigned long startTime = millis();
+        bool respostaRecebida = false;
+
         // Mantém a lógica de aguardar até que INPUT_E2 saia da condição < 500
         while (analogRead(INPUT_E2) < 500) {
             if (Serial.available() > 0) {
                 char ser = Serial.read();
                 if (ser == 'n') {
-                  defeito_v2 = 1;
-                  break;
+                    defeito_v2 = 1;
+                    respostaRecebida = true;
+                    break;
+                } else if (ser == 'o') {
+                    respostaRecebida = true;
+                    break;
                 }
+            }
+
+            // Verifica se se passaram 5 segundos sem resposta
+            if (millis() - startTime > 2000) {
+                digitalWrite(OUTPUT_SR, HIGH); // Aciona SR
+                respostaRecebida = true;
+                break;
             }
         }
 
+        // Aguarda até que INPUT_E2 saia da condição < 500
         while (analogRead(INPUT_E2) < 500) {}
-        etapa = 0;
+
+        etapa = 3;
     }
 }
-
 
 
 void reset_sinalizador() {

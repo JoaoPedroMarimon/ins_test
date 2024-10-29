@@ -179,6 +179,7 @@ def main():
                     if inspecao_ok:
                         print("APROVADO enviado")
                         # aqui deve enviar o resultado APROVADO
+                        ser.write(b'o' if inspecao_ok else b'n')
                     else:
                         print("REPROVADO enviado")
                         # aqui deve enviar o resultado REPROVADO

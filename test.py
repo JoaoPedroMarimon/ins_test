@@ -1,12 +1,8 @@
-import queue
 
-from src.IHM.hmi_receiver import HMIReceiver
 
-servidor = HMIReceiver()
+import tkinter as tk
 
-while True:
-        try:
-            packet = servidor._packet_queue.get(timeout=1)
-            print(f"Pacote recebido: {packet}")
-        except queue.Empty:
-            continue
+if __name__ == '__main__':
+    d = tk.Tk()
+    d.wm_attributes("-fullscreen", True)
+    d.mainloop()
