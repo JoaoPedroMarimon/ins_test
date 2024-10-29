@@ -209,6 +209,9 @@ def main():
             time.sleep(5)
 
 if __name__ == '__main__':
+    config = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
 
-    main()
+    ihm = IHM(config["products"])
+    ihm.run_ihm()
+    print(f"O botão foi clicado", ihm.get_status_button_continue())
 
