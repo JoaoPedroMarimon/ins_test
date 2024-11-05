@@ -32,3 +32,9 @@ class IHM(Singleton,Interface):
     def open_limit_exceed_screen(self):
         self._server.open_limit_exceed_screen()
 
+    def send_approved(self) -> None:
+        self._server.send_approved()
+
+    def send_reproved(self) -> None:
+        self._server.send_reproved()
+

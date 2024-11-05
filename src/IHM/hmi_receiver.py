@@ -27,12 +27,12 @@ class HMIReceiver(IPCServer, ABC):
 
     def packet_receiver(self):
         while True:
+            print("ANTES DO GET PACKERTTTTTTTTTT")
             packet = self.get_packet()
             print(f"packet {packet.message} received!!!\n whith the message: {packet.body} ")
             match packet.message:
                 case 'get_model':
                     self._ihm_status.update(packet.body)
-                    break
                 case "button_continue":
                     self._ihm_status["button"] = packet.body['status']
     def send_approved(self) -> None:
@@ -54,3 +54,4 @@ class HMIReceiver(IPCServer, ABC):
         super().start()
         self._receive_packet_handler_thread = Thread(target=self.packet_receiver,daemon=True)
         self._receive_packet_handler_thread.start()
+

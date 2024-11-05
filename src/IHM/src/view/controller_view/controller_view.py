@@ -41,6 +41,8 @@ class ControllerView(QObject):
         self.limit_screen.IsClicked.connect(self.send_packet_button_continue)
 
     def open_first_screen(self) -> None:
+        self.second_screen.set_name_switch('MODELO SWITCH')
+        self._server.send_model_index(self.get_model_index())
         self.first_screen.setVisible(True)
 
     def open_second_screen(self) -> None:

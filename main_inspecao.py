@@ -1,6 +1,8 @@
 import logging
 import os
 import time
+from time import sleep
+
 import serial
 import src
 import cv2
@@ -117,86 +119,89 @@ def main():
 
     pad_inspec = src.TemplateInspection()
 
-    index_modelo = None  # Inicializa o index_modelo vazio
-
     # Faz a leitura dos modelos no json
     # Aqui deve enviar os nomes dos modelos para a IHM
     for index, produto in enumerate(config['products']):
         print(f"Posição: {index}, Nome do produto: {produto['name']}")
 
-    ihm = src.IHM() # Abre a IHM
+    ihm = src.IHM(config['products'])
+    ihm.run_ihm()
 
-    # Esse while enquanto a tela esta aberta
+    previous_index_modelo = None  # Variável para rastrear mudanças no modelo
+
     while ihm.is_alive():
+        index_modelo = ihm.get_model_index()
 
-        # Modificar aqui para a função de modelo vindo da IHM
-        while index_modelo is None:
-            ser.write(b'y')  # Coloca o arduino em standby (inicialmente ja ta): entra na etapa -1 inexistente
+        if index_modelo is None and previous_index_modelo is not None:
+            ser.write(b'y')
+            sleep(1)
+            print("Enviando 'y' para standby")
 
-            try:
-                index_modelo = int(input("Digite a posição do produto: "))
-                if 0 <= index_modelo < 3:
-                    ser.write(b'x') # Tira o arduino do standby: entra na etapa 0
-                    break
-                else:
-                    print(f"Índice inválido. Digite um número entre 0 e {len(config['products']) - 1}.")
-            except ValueError:
-                print("Por favor, digite um número válido.")
+        elif index_modelo is not None and previous_index_modelo is None:
 
-        if index_modelo is not None:
+            ser.write(b'x')
+            print(f"Modelo selecionado: {index_modelo}")  # Imprime apenas uma vez na mudança para valor válido
 
             produto_config = config['products'][index_modelo]
             pad_inspec.config = produto_config["pad-inspection"]
-            pad_inspec.templates_path = f"./samples/{config['products'][index_modelo]['name']}/templates"
+            pad_inspec.templates_path = f"./samples/{produto_config['name']}/templates"
             status = produto_config['status']
 
-            read = ser.read().strip(b"\r\n")
 
-            if read in [b"p", b"s"]:
-                frame = capturar_frame(camera)
-                timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                posicao = "posicao_1" if read == b"p" else "posicao_2"
+            # Laço contínuo para monitorar a comunicação serial
 
-                '''
-                Status possíveis:
-                    A: apenas salva o frame (pasta geral > sem_classif)
-                    B: inspeciona e salva o frame (pasta geral > com_classif > OK ou NOK)
-                    C: inspeciona e classifica o frame
-                    D: inspeciona, classifica e salva o frame (pasta teste > OK ou NOK)
-                '''
+            while True:
+                if ser.in_waiting > 0:
+                    read = ser.readline().strip(b"\r\n")
+                    print(f"Recebido: {read}")
 
-                if status in ('A'):
-                    salvar_imagem(frame, produto_config['name'], posicao, "geral/sem_clasif", timestamp)
+                    if read == b"v":
+                        if index_modelo is None:
+                            sleep(1)
+                            ser.write(b'k')  # Retorna 'k' se o modelo estiver vazio
+                            print("Modelo vazio, retornando 'k' e aguardando seleção")
+                        elif index_modelo == previous_index_modelo:
+                            sleep(1)
+                            ser.write(b'j')  # Retorna 'j' se o modelo não mudou
+                            print("Modelo atual igual ao anterior, retornando 'j'")
+                        else:
+                            sleep(1)
+                            ser.write(b'j')  # Retorna 'j' e altera diretórios
+                            produto_config = config['products'][index_modelo]
+                            pad_inspec.config = produto_config["pad-inspection"]
+                            pad_inspec.templates_path = f"./samples/{produto_config['name']}/templates"
+                            status = produto_config['status']
+                            print("Modelo diferente, alterando diretórios e retornando 'j'")
 
-                if status in ('B'):
-                    frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
-                    pasta = f"geral/com_clasif/ok" if inspecao_ok else f"geral/com_clasif/nok"
-                    salvar_imagem(frame, produto_config['name'], posicao, pasta, timestamp)
+                    elif read == b"p" or read == b"s":
+                        frame = capturar_frame(camera)
+                        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                        posicao = "posicao_1" if read == b"p" else "posicao_2"
 
-                if status in ('C'):
-                    frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
-                    classificar_resultado(inspecao_ok)
-                    if inspecao_ok:
-                        print("APROVADO enviado")
-                        # aqui deve enviar o resultado APROVADO
-                        ser.write(b'o' if inspecao_ok else b'n')
-                    else:
-                        print("REPROVADO enviado")
-                        # aqui deve enviar o resultado REPROVADO
-                        ser.write(b'o' if inspecao_ok else b'n')
+                        if status == 'A':
+                            salvar_imagem(frame, produto_config['name'], posicao, "geral/sem_clasif", timestamp)
+                        elif status == 'B':
+                            frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+                            pasta = "geral/com_clasif/ok" if inspecao_ok else "geral/com_clasif/nok"
+                            salvar_imagem(frame, produto_config['name'], posicao, pasta, timestamp)
+                        elif status == 'C':
+                            frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+                            classificar_resultado(inspecao_ok)
+                            ihm.send_approved() if inspecao_ok else ihm.send_reproved()
+                            ser.write(b'o' if inspecao_ok else b'n')
+                        elif status == 'D':
+                            frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+                            classificar_resultado(inspecao_ok)
+                            pasta = "teste/ok" if inspecao_ok else "teste/nok"
+                            salvar_imagem(frame, produto_config['name'], posicao, pasta, timestamp)
+                            ser.write(b'o' if inspecao_ok else b'n')
 
-                if status in ('D'):
-                    frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
-                    classificar_resultado(inspecao_ok)
-                    pasta = "teste/ok" if inspecao_ok else "teste/nok"
-                    salvar_imagem(frame, produto_config['name'], posicao, pasta, timestamp)
-                    # aqui envia o resultado 'o' para aprovado e 'n' para reprovado
-                    ser.write(b'o' if inspecao_ok else b'n')
+                    elif read == b"w":
+                        ihm.open_limit_exceed_screen()
+                        print("enviado aviso de limite excedido p/ tela")
 
-            # aqui recebe o aviso de limite reprovadas do arduino
-            # deve chamar a funcao p/ abrir popup
-            if read == b"w":
-                print("enviado aviso de limite excedido p/ tela")
+                else:
+                    sleep(0.1)  # Aguarda um pouco antes de tentar ler novamente
 
 if __name__ == '__main__':
     main()

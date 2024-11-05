@@ -3,10 +3,11 @@ import argparse
 import re
 from argparse import ArgumentParser
 
+from main_inspecao import inspecionar_frame
 from .serial_connection import SerialController
 from . import environment as env
 from . import utils
-#from .inspection_designer.inspection_designer import inspection
+from .inspection_designer.inspection_designer import inspection
 
 
 class NotAProductError(Exception):
@@ -143,7 +144,7 @@ def execute_parse(args) -> None:
 
             inspection_obj.config = product_data[args.inspection]
             window = inspection_obj.load_designer(product_data['name'])
-            window.load_video_source(utils.get_rtsp_url(**config["camera"]))
+      #      window.load_video_source(utils.get_rtsp_url(**config["camera"]))
             do_save = window.mainloop()
             if do_save:
                 utils.dump_json_configfile(env.CONFIGFILE_PATHNAME, config)
