@@ -2,6 +2,7 @@ import logging
 import os
 import time
 from time import sleep
+from tkinter.messagebox import RETRY
 
 import serial
 import src
@@ -104,6 +105,7 @@ def classificar_resultado(inspecao_ok):
     else:
         print("NOK")
 
+'''
 def main():
     args = src.main_parse()
     src.init_logging(logging.WARNING, stream_handler=True, log_directory=".", debug=args.debug)
@@ -120,12 +122,12 @@ def main():
     pad_inspec = src.TemplateInspection()
 
     # Faz a leitura dos modelos no json
-    # Aqui deve enviar os nomes dos modelos para a IHM
     for index, produto in enumerate(config['products']):
         print(f"Posição: {index}, Nome do produto: {produto['name']}")
 
     ihm = src.IHM(config['products'])
     ihm.run_ihm()
+    print (ihm.get_model_index())
 
     previous_index_modelo = None  # Variável para rastrear mudanças no modelo
 
@@ -136,26 +138,28 @@ def main():
             ser.write(b'y')
             sleep(1)
             print("Enviando 'y' para standby")
+            previous_index_modelo = None  # Atualiza para None quando volta ao modo standby
 
-        elif index_modelo is not None and previous_index_modelo is None:
+        elif index_modelo is not None:
+            if previous_index_modelo is None or index_modelo != previous_index_modelo:
+                ser.write(b'x')
+                print(f"Modelo selecionado: {index_modelo}")  # Imprime apenas uma vez na mudança para valor válido
 
-            ser.write(b'x')
-            print(f"Modelo selecionado: {index_modelo}")  # Imprime apenas uma vez na mudança para valor válido
+                produto_config = config['products'][index_modelo]
+                pad_inspec.config = produto_config["pad-inspection"]
+                pad_inspec.templates_path = f"./samples/{produto_config['name']}/templates"
+                status = produto_config['status']
 
-            produto_config = config['products'][index_modelo]
-            pad_inspec.config = produto_config["pad-inspection"]
-            pad_inspec.templates_path = f"./samples/{produto_config['name']}/templates"
-            status = produto_config['status']
-
+                previous_index_modelo = index_modelo  # Atualiza o modelo anterior para o modelo atual
 
             # Laço contínuo para monitorar a comunicação serial
-
-            while True:
+            if index_modelo is not None:
                 if ser.in_waiting > 0:
                     read = ser.readline().strip(b"\r\n")
                     print(f"Recebido: {read}")
 
                     if read == b"v":
+                        print(index_modelo)
                         if index_modelo is None:
                             sleep(1)
                             ser.write(b'k')  # Retorna 'k' se o modelo estiver vazio
@@ -196,12 +200,96 @@ def main():
                             salvar_imagem(frame, produto_config['name'], posicao, pasta, timestamp)
                             ser.write(b'o' if inspecao_ok else b'n')
 
+                        previous_index_modelo = index_modelo
+
                     elif read == b"w":
                         ihm.open_limit_exceed_screen()
                         print("enviado aviso de limite excedido p/ tela")
 
                 else:
                     sleep(0.1)  # Aguarda um pouco antes de tentar ler novamente
+'''
 
-if __name__ == '__main__':
+def main():
+    args = src.main_parse()
+    src.init_logging(logging.WARNING, stream_handler=True, log_directory=".", debug=args.debug)
+    logging.warning(f"init with {args}")
+
+    if args.subparser is not None or args.serial_data:
+        src.execute_parse(args)
+        return
+
+    ser = verificar_conexao_serial(args)
+    camera = verificar_conexao_camera(src.DEFAULT_CONFIGFILE["camera"])
+    config = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
+
+    pad_inspec = src.TemplateInspection()
+
+    # Faz a leitura dos modelos no json
+    for index, produto in enumerate(config['products']):
+        print(f"Posição: {index}, Nome do produto: {produto['name']}")
+
+    ihm = src.IHM(config['products'])
+    ihm.run_ihm()
+
+    while ihm.is_alive():
+        index_modelo = ihm.get_model_index()
+
+        if index_modelo is None:
+            ser.write(b'y')
+            sleep(1)
+            print("Enviando 'y' para standby")
+
+        elif index_modelo is not None:
+            ser.write(b'x')
+            print(f"Modelo selecionado: {index_modelo}")  # Imprime apenas uma vez na mudança para valor válido
+
+            produto_config = config['products'][index_modelo]
+            pad_inspec.config = produto_config["pad-inspection"]
+            pad_inspec.templates_path = f"./samples/{produto_config['name']}/templates"
+            status = produto_config['status']
+
+            # Laço contínuo para monitorar a comunicação serial
+            while index_modelo is not None:
+                if ser.in_waiting > 0:
+                    read = ser.readline().strip(b"\r\n")
+                    print(f"Recebido: {read}")
+
+                    if read == b"p" or read == b"s":
+                        frame = capturar_frame(camera)
+                        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                        posicao = "posicao_1" if read == b"p" else "posicao_2"
+
+                        if status == 'A':
+                            salvar_imagem(frame, produto_config['name'], posicao, "geral/sem_clasif", timestamp)
+                        elif status == 'B':
+                            frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+                            pasta = "geral/com_clasif/ok" if inspecao_ok else "geral/com_clasif/nok"
+                            salvar_imagem(frame, produto_config['name'], posicao, pasta, timestamp)
+                        elif status == 'C':
+                            frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+                            classificar_resultado(inspecao_ok)
+                            ihm.send_approved() if inspecao_ok else ihm.send_reproved()
+                            ser.write(b'o' if inspecao_ok else b'n')
+                        elif status == 'D':
+                            frame_processado, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+                            classificar_resultado(inspecao_ok)
+                            pasta = "teste/ok" if inspecao_ok else "teste/nok"
+                            salvar_imagem(frame, produto_config['name'], posicao, pasta, timestamp)
+                            ihm.send_approved() if inspecao_ok else ihm.send_reproved()
+                            ser.write(b'o' if inspecao_ok else b'n')
+
+                    elif read == b"w":
+                        ihm.open_limit_exceed_screen()
+                        print("enviado aviso de limite excedido p/ tela")
+
+                index_modelo = ihm.get_model_index()
+
+                if index_modelo is None:
+                    print("Modelo desmarcado, retornando ao modo de espera.")
+                    break  # Sai do loop e retorna ao início do loop principal
+
+                time.sleep(0.1)  # Pequena pausa para evitar leitura excessiva
+
+if __name__ == "__main__":
     main()

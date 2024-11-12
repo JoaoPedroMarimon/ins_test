@@ -46,6 +46,7 @@ class ControllerView(QObject):
         self.first_screen.setVisible(True)
 
     def open_second_screen(self) -> None:
+        self.second_screen.clean_history()
         self.second_screen.setVisible(True)
 
     def open_limit_exceed(self):

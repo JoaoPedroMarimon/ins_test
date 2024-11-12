@@ -16,8 +16,8 @@ Controle de Versões:
 
 #define INPUT_E1 A1 // Pino do sinal do clp inicio/fim para zerar contador etapas do processo (ENTRADA 1 - 24v)
 #define INPUT_E2 A0 // Pino do sinal do clp sensor carro recuado (ENTRADA 2 - 24v)
-#define INPUT_E3 A2 // Pino do botao reset do sinalizador (ENTRADA 3 - 12v)
-#define INPUT_E4 A3 // Pino do sensor de posição do gabarito (ENTRADA 4 - 12v)
+#define INPUT_E3 A2 // Pino do botao reset do sinalizador (ENTRADA 3 - 24v)
+#define INPUT_E4 A3 // Pino do sensor de posição do gabarito (ENTRADA 4 - 24v)
 
 
 #define OUTPUT_S1 5 // Pino alimentacao solenoide valvula 1 (SAIDA 1)
@@ -28,8 +28,8 @@ Controle de Versões:
 #define OUTPUT_SR 11 // Pino alimentacao torre sinalizacao (RELE) 
 
 int etapa = -1;
-int defeito_v1 = 0;
-int defeito_v2 = 0;
+int defeito_v1 = 1;
+int defeito_v2 = 1;
 int cont_reprovadas = 0;
 // const int NUMERO_MAXIMO_DE_REPROVACOES = ; Isso fala sobre as quantidades máximas que a máquina irá aturar no sistema. Fica melhor numa constanste para facilitar mudanças futuras
 
@@ -158,31 +158,8 @@ void segunda_inspecao() {
         // Aguarda até que INPUT_E2 saia da condição < 500
         while (analogRead(INPUT_E2) < 500) {}
         
-        etapa = 4;
+        etapa = 0;
     }
-}
-
-void verifica_modelo() {
-  delay(1000);
-  if (!enviado) {
-    Serial.println("v");
-    enviado = true;  // Marca como enviado
-  }
-
-  // Aguarda a resposta da serial
-  if (Serial.available() > 0) {
-    char resposta = Serial.read();
-
-    // Verifica a resposta e ajusta a variável etapa
-    if (resposta == 'j') {
-      etapa = 0;
-    } else if (resposta == 'k') {
-      etapa = -1;
-    }
-
-    // Reset para permitir o envio de 'v' novamente em outra chamada se necessário
-    enviado = false;
-  }
 }
 
 void reset_sinalizador() {
@@ -191,7 +168,6 @@ void reset_sinalizador() {
         cont_reprovadas = 0;
     }
 }
-
 
 
 void setup() {
@@ -221,6 +197,8 @@ void loop() {
        char ser = Serial.read(); 
        if(ser == 'x') {
         digitalWrite(OUTPUT_S3, LOW);
+        defeito_v1 = 1;
+        defeito_v2 = 1;
         etapa = 0;
        }
        else if(ser == 'y') { //A interface enviou um modo espera para o arduino
@@ -235,6 +213,4 @@ void loop() {
     else if (etapa == 1)verifica_defeito(); //verifica os defeitos antes de inspecionar? Não deveria ser o inverso? |Pois ele irá responder para o ciclo anterior|
     else if (etapa == 2)primeira_inspecao();
     else if (etapa == 3)segunda_inspecao();
-    else if (etapa == 4)verifica_modelo();
-
 }

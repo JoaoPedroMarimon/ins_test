@@ -32,6 +32,7 @@ class SecondScreen(QMainWindow, Ui_MainWindow):
 
     def to_first_screen(self):
         self.setVisible(False)
+        self.clean_history()
         self.OpenFirstScreen.emit()
 
     def get_on_inspection_functions(self) -> list:
@@ -70,6 +71,8 @@ class SecondScreen(QMainWindow, Ui_MainWindow):
         self.show_placard = True
 
     def enum_to_history(self, result):
+        # if not self.isVisible():
+        #     return
         if result == InspectionResult.APROVADO:
             obj = self.queue_hisory.get()
             obj.setText('APROVADO')
@@ -94,6 +97,14 @@ class SecondScreen(QMainWindow, Ui_MainWindow):
         self.queue_hisory.put(self.label_product_one)
         self.queue_hisory.put(self.label_product_two)
         self.queue_hisory.put(self.label_product_three)
+
+    def clean_history(self):
+        print("teste range: ",lambda: range(0,2))
+        for _ in range(0,3):
+            self.enum_to_history("INPECIONANDO") #Só para cair no else do método
+        self.confing_history()
+
+
 
 
     def mostrar_aprovado_reprovado(self, resultado: InspectionResult):
