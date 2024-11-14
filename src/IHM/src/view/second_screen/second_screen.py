@@ -1,3 +1,5 @@
+import time
+
 from src.IHM.src.components.video_preview.video_preview import VideoPreview
 import queue
 from src.IHM.src.view.second_screen.ui_second_screen import Ui_MainWindow
@@ -71,8 +73,8 @@ class SecondScreen(QMainWindow, Ui_MainWindow):
         self.show_placard = True
 
     def enum_to_history(self, result):
-        # if not self.isVisible():
-        #     return
+        if self.is_history_full():
+            self.clean_history()
         if result == InspectionResult.APROVADO:
             obj = self.queue_hisory.get()
             obj.setText('APROVADO')
@@ -84,7 +86,6 @@ class SecondScreen(QMainWindow, Ui_MainWindow):
             obj.setText('REPROVADO')
             obj.setStyleSheet("background-color: #ff0000; color: white;")
             self.queue_hisory.put(obj)  # Coloca o objeto de volta na fila
-
         else:
             obj = self.queue_hisory.get()
             obj.setText("INSPECIONANDO...")
@@ -92,17 +93,25 @@ class SecondScreen(QMainWindow, Ui_MainWindow):
 
 
 
+
     def confing_history(self):
         self.queue_hisory = queue.Queue()
         self.queue_hisory.put(self.label_product_one)
         self.queue_hisory.put(self.label_product_two)
-        self.queue_hisory.put(self.label_product_three)
 
     def clean_history(self):
-        print("teste range: ",lambda: range(0,2))
-        for _ in range(0,3):
-            self.enum_to_history("INPECIONANDO") #Só para cair no else do método
+        for _ in range(0,self.queue_hisory.qsize()):
+            obj = self.queue_hisory.get()
+            obj.setText("INSPECIONANDO...")
+            obj.setStyleSheet("background-color: yellow")
         self.confing_history()
+
+    def is_history_full(self) -> bool:
+        if self.label_product_one.text() != "INSPECIONANDO..." and self.label_product_two.text() != "INSPECIONANDO...":
+            return True
+        return False
+
+
 
 
 
