@@ -27,7 +27,6 @@ class HMIReceiver(IPCServer, ABC):
 
     def packet_receiver(self):
         while True:
-            print("ANTES DO GET PACKERTTTTTTTTTT")
             packet = self.get_packet()
             print(f"packet {packet.message} received!!!\n whith the message: {packet.body} ")
             match packet.message:
@@ -40,6 +39,9 @@ class HMIReceiver(IPCServer, ABC):
 
     def send_reproved(self) -> None:
         self._send_packet(Packet("0",PacketType.REQUEST,"inspection", {"result":"reproved"}))
+
+    def new_cycle(self) -> None:
+        self._send_packet(Packet("0",PacketType.REQUEST,"inspection", {"result":"new_cycle"}))
 
     def get_model_index(self) -> int | None:
         return self._ihm_status['model']

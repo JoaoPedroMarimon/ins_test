@@ -26,7 +26,7 @@ class ControllerView(QObject):
         self._server.OpenLimitExceed.connect(self.open_limit_exceed)
 
     def show(self):
-        self.first_screen.show()
+        self.first_screen.showFullScreen()
 
     def signals_first_screen(self) -> None:
         self.first_screen.modelSig.connect(self.switch_model_to_second_screen)

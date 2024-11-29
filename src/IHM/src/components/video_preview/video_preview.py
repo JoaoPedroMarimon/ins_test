@@ -23,7 +23,7 @@ class VideoPreview(QWidget):
     def _creating_instances(self):
         self.video_thread = None
         self._camera_source = get_rtsp_url("192.168.1.108","admin","admin123",subtype=1)
-        self._size: tuple[int, int] = (self.parent().width(), self.parent().height())
+        self._size: tuple[int, int] = (self.parent().height(),self.parent().width())
         self.photo_viewer = PhotoViewer(self)
 
     def _adjusting_photo_viewer(self):
@@ -41,7 +41,8 @@ class VideoPreview(QWidget):
 
     def _update_video_label(self, frame: np.ndarray):
         self._latest_frame = frame
-
+        self._size = (self.parent().width(),self.parent().height())
+        self.setGeometry(0,0,self.parent().width(),self.parent().height())
         frame = cv2.resize(frame,self._size, cv2.INTER_AREA)
         q_image = qimage2ndarray.array2qimage(frame)
         pixmap = QPixmap.fromImage(q_image)

@@ -1,3 +1,5 @@
+from functools import partial
+
 from src.IHM.src.view.first_screen.main_window_ui import Ui_MainWindow
 from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QLabel,
     QMainWindow, QPushButton, QSizePolicy, QWidget)
@@ -11,15 +13,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, product_json:list):
         super(MainWindow, self).__init__()
         self.setupUi(self)
-        # Executa uma função lambda(anônima) em linha, fazendo com que chame a função de mostrar a tela passando o modelo
-        self.button_model_sf800.setText(product_json[0]['name'])
-        self.button_model_sg800.setText(product_json[1]['name'])
-        self.button_model_s1108f.setText(product_json[2]['name'])
-        self.button_model_s1108g.setText("Sobra")
-        self.button_model_sf800.clicked.connect(lambda: self.set_model_switch(product_json[0]['name']))
-        self.button_model_sg800.clicked.connect(lambda: self.set_model_switch(product_json[1]['name']))
-        self.button_model_s1108f.clicked.connect(lambda: self.set_model_switch(product_json[2]['name']))
-        self.button_model_s1108g.clicked.connect(lambda: self.set_model_switch("Sobra"))
+        button_list = [self.button_model_a_2,self.button_model_b_2,self.button_model_c_2,self.button_model_d_2]
+        index = 0
+        for index, product in enumerate(product_json):
+            button_list[index].setText(product['name'])
+            button_list[index].clicked.connect(partial(self.set_model_switch,product['name']))
+        button_list = button_list[index+1:]
+        for button in button_list:
+            button.setVisible(False)
+
 
     def closeEvent(self, event):
         self.OnClose.emit()
@@ -29,7 +31,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setVisible(False)
         self.OpenSecondScreen.emit()
 
-    def set_model_switch(self, model_name):
+    def set_model_switch(self, model_name: str) -> None:
         self.modelSig.emit(model_name)
         self.to_second_screen()
         """

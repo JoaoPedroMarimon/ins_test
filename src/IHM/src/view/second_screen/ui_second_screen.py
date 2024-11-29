@@ -9,8 +9,8 @@
 ################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
+                            QMetaObject, QObject, QPoint, QRect,
+                            QSize, QTime, QUrl, Qt, QPropertyAnimation, QEasingCurve)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
@@ -85,15 +85,6 @@ class Ui_MainWindow(object):
         self.label_product_two.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout.addWidget(self.label_product_two)
-
-        self.label_product_three = QLabel(self.verticalLayoutWidget)
-        self.label_product_three.setObjectName(u"label_product_three")
-        self.label_product_three.setFont(font2)
-        self.label_product_three.setStyleSheet(u"background-color: yellow;")
-        self.label_product_three.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.verticalLayout.addWidget(self.label_product_three)
-
         self.placard_jiga = QLabel(self.centralwidget)
         self.placard_jiga.setObjectName(u"placard_jiga")
         self.placard_jiga.setEnabled(True)
@@ -116,7 +107,6 @@ class Ui_MainWindow(object):
         self.back_to_firstscreen.setGeometry(QRect(0, 0, 191, 31))
         self.back_to_firstscreen.setStyleSheet(u"background-color: RED; color: white;")
         MainWindow.setCentralWidget(self.centralwidget)
-
         self.retranslateUi(MainWindow)
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -131,7 +121,6 @@ class Ui_MainWindow(object):
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"HIST\u00d3RICO", None))
         self.label_product_one.setText(QCoreApplication.translate("MainWindow", u"INSPECIONANDO...", None))
         self.label_product_two.setText(QCoreApplication.translate("MainWindow", u"INSPECIONANDO...", None))
-        self.label_product_three.setText(QCoreApplication.translate("MainWindow", u"INSPECIONANDO...", None))
         self.placard_jiga.setText(QCoreApplication.translate("MainWindow", u"INSPE\u00c7\u00c3O TAMPOGRAFIA SWITCH 8p", None))
         self.switch_model.setText(QCoreApplication.translate("MainWindow", u"MODELO SWITCH", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"\u00daLTIMAS TR\u00caS PE\u00c7AS", None))

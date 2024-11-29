@@ -37,11 +37,13 @@ bool enviado = false;
 
 void aguarda_inicio() {
     if(analogRead(INPUT_E1) < 500) {
+        delay(300);
         etapa = 1;
     }
 }
 
 void verifica_defeito() {
+  delay(300);
     if (analogRead(INPUT_E2) < 500) {  // se o carro estiver no local de checagem, ou seja, liberado para o controlador soltar as placas defeituosas
         if (defeito_v1 == 1 && defeito_v2 == 0) {
           //Delay para saber quando soltar
@@ -71,19 +73,22 @@ void verifica_defeito() {
         else if (defeito_v1 == 0 && defeito_v2 == 0) {
             cont_reprovadas = 0;
         }
-        if (cont_reprovadas >= 4) { //pode colocar a constante NUMERO_MAXIMO_DE_REPROVACOES aqui
-            digitalWrite(OUTPUT_SR, HIGH); //ATIVAR SIRENE
+        if (cont_reprovadas >= 99999) { //pode colocar a constante NUMERO_MAXIMO_DE_REPROVACOES aqui
+            digitalWrite(OUTPUT_SR, LOW); //ATIVAR SIRENE
             Serial.println("w");
             cont_reprovadas = 0;       
         }
         while (analogRead(INPUT_E2) < 500) {} // Esperar o carro sair da área de checagem para a próxima etapa
                 etapa = 2;
+                
+                
     }
 }
 
 void primeira_inspecao() {
+    delay(300);
     if (analogRead(INPUT_E2) < 500) { // Voltando para a área de checagem
-        delay(500);
+        delay(3000);
 
         if (analogRead(INPUT_E4) > 500) {
             Serial.println("p");
@@ -107,7 +112,7 @@ void primeira_inspecao() {
             }
 
             // Verifica se se passaram 5 segundos sem resposta
-            if (millis() - startTime > 5000) {
+            if (millis() - startTime > 2000) {
                 digitalWrite(OUTPUT_SR, HIGH); // Aciona SR
                 defeito_v1 = 1;
                 break;
@@ -123,8 +128,9 @@ void primeira_inspecao() {
 
 
 void segunda_inspecao() {
+    delay(300);
     if (analogRead(INPUT_E2) < 500) { // Voltando para a área de checagem
-        delay(500);
+        delay(3000);
 
         if (analogRead(INPUT_E4) > 500) {
             Serial.println("p");
@@ -147,8 +153,8 @@ void segunda_inspecao() {
                 }
             }
 
-            // Verifica se se passaram 5 segundos sem resposta
-            if (millis() - startTime > 5000) {
+            // Verifica se se passaram 1 segundos sem resposta
+            if (millis() - startTime > 2000) {
                 digitalWrite(OUTPUT_SR, HIGH); // Aciona SR
                 defeito_v2 = 1;
                 break;
@@ -162,7 +168,7 @@ void segunda_inspecao() {
     }
 }
 
-void reset_sinalizador() {
+void reset_sinalizador() { 
     if(analogRead(INPUT_E3) < 500) {
         digitalWrite(OUTPUT_SR, LOW);
         cont_reprovadas = 0;
@@ -193,15 +199,18 @@ void setup() {
 
 void loop() {
 
-    while((Serial.available() > 0)){  
-       char ser = Serial.read(); 
-       if(ser == 'x') {
+    while(Serial.available() > 0){  
+      char ser = Serial.read();
+      if(ser == 'x') {
         digitalWrite(OUTPUT_S3, LOW);
+        cont_reprovadas = 0;
         defeito_v1 = 1;
         defeito_v2 = 1;
         etapa = 0;
        }
-       else if(ser == 'y') { //A interface enviou um modo espera para o arduino
+
+       else if(ser == 'y') {
+        //A interface enviou um modo espera para o arduino
         digitalWrite(OUTPUT_S3, HIGH);
         etapa = -1;
        }

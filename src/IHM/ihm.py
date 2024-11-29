@@ -38,3 +38,6 @@ class IHM(Singleton,Interface):
     def send_reproved(self) -> None:
         self._server.send_reproved()
 
+    def new_cycle(self) -> None:
+        self._server.new_cycle()
+

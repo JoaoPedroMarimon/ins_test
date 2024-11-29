@@ -2,9 +2,11 @@ from enum import Enum
 
 
 class InspectionResult(Enum):
+
     NAO_INSPECIONADO = 0
     APROVADO = {"background": "#00A336", "color": "cor: #fff"}
     REPROVADO = {"background": "#ff0000", "color": "cor: #fff"}
+    NOVO_CICLO = 3
 
     @classmethod
     def convert_to_enum(cls, req) -> Enum:
