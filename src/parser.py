@@ -3,7 +3,7 @@ import argparse
 import re
 from argparse import ArgumentParser
 
-from main_inspecao import inspecionar_frame
+from main import inspecionar_frame
 from .serial_connection import SerialController
 from . import environment as env
 from . import utils
