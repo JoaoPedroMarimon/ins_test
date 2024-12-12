@@ -1,7 +1,7 @@
 import logging
 import os
 import time
-from time import sleep
+from time import sleep, pthread_getcpuclockid
 from tkinter.messagebox import RETRY
 
 import serial
@@ -186,8 +186,8 @@ def main():
                         ihm.open_limit_exceed_screen()
                         print("enviado aviso de limite excedido p/ tela")
 
-                    # elif read == b"k":
-                    #     ihm.new_cycle() # clean history
+                    elif read == b"k":
+                        ihm.new_cycle() # clean history
                 index_modelo = ihm.get_model_index()
 
                 if index_modelo is None:
