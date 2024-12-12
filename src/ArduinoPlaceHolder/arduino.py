@@ -16,6 +16,7 @@ class Arduino:
     step 2 and 3 = send when the switch need to be inspected
     '''
     def __init__(self):
+        self.teste = None
         self.in_buffer = queue.Queue()
         self.out_buffer = queue.Queue()
         self.error_counter = 0
@@ -45,7 +46,6 @@ class Arduino:
             entry = None
         else:
             entry = self.in_buffer.get()
-        print(entry)
         if entry is not None:
             match entry: #mensages from main
                 case b'y':
@@ -64,15 +64,15 @@ class Arduino:
                     self.error_counter += 1
         time.sleep(3)
         #mesages to main!
-        if self.error_counter > 3:
+        if self.error_counter > 6:
             self.out_buffer.put(b"w")
         else:
-            print(self._step == 0)
             match self._step:
                 case 0:
-                    self.out_buffer.put(b'N')
+                    self.out_buffer.put(b'k')
+                    time.sleep(3)
                     self._step = 2
-                    # print(self.in_buffer.get())
+                    self.simulate()
                 case 2:
                     self.out_buffer.put(b'p')
                     self._step = 3
