@@ -1,6 +1,7 @@
 from abc import ABC
 from typing import Dict, Callable, Any
 
+import numpy as np
 from PySide6.QtCore import QObject, Signal
 from src.IHM.src.components.communication.interfaces.qt_ipc_client import QtIPCClient
 from src.IHM.src.components.communication.Enum.Inspetion_result import InspectionResult
@@ -13,6 +14,7 @@ from src.IHM.src.components.communication.message_controller import MessageContr
 class IHMClient(QtIPCClient, ABC):
     OnReceiveResult = Signal(InspectionResult)
     OpenLimitExceed = Signal()
+    OnReceiveFrame = Signal(dict)
     def __init__(self):
         super().__init__(address="/tmp/IHM",packet_schema=BASE_PACKET_SCHEMA)
         self.packetReceivedSig.connect(self.react_packet)
@@ -29,12 +31,13 @@ class IHMClient(QtIPCClient, ABC):
         self._send_packet(Packet("0",PacketType.REQUEST,message="get_model", body={"model":model}))
 
     def react_packet(self, packet: Packet) -> None:
-        print(packet)
         match packet.message:
             case "inspection":
                 self.OnReceiveResult.emit(MessageController.convert_result_to_enum(packet.body["result"]))
             case "limit_exceed":
                 self.OpenLimitExceed.emit()
+            case "frame_inspection":
+                self.OnReceiveFrame.emit(packet.body)
 
 
     def close(self):

@@ -1,5 +1,9 @@
 from abc import ABC
 from threading import Thread
+
+import numpy as np
+from numpy.random.mtrand import Sequence
+
 from src.IHM.src.components.communication.interfaces.ipc_server import IPCServer
 from src.IHM.src.components.communication.packet.utils import BASE_PACKET_SCHEMA
 from src.IHM.src.components.communication.packet.packet import Packet, PacketType
@@ -39,6 +43,9 @@ class HMIReceiver(IPCServer, ABC):
 
     def send_reproved(self) -> None:
         self._send_packet(Packet("0",PacketType.REQUEST,"inspection", {"result":"reproved"}))
+
+    def send_inspect_frame(self,markers):
+        self._send_packet(Packet("0",PacketType.REQUEST,"frame_inspection",{"markers": markers}))
 
     def new_cycle(self) -> None:
         self._send_packet(Packet("0",PacketType.REQUEST,"inspection", {"result":"new_cycle"}))
