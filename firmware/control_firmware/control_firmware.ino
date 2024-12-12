@@ -37,59 +37,57 @@ bool enviado = false;
 
 void aguarda_inicio() {
     if(analogRead(INPUT_E1) < 500) {
-        delay(300);
+        delay(500);
         etapa = 1;
     }
 }
 
 void verifica_defeito() {
-  delay(300);
+    delay(1000);
     if (analogRead(INPUT_E2) < 500) {  // se o carro estiver no local de checagem, ou seja, liberado para o controlador soltar as placas defeituosas
         if (defeito_v1 == 1 && defeito_v2 == 0) {
-          //Delay para saber quando soltar
+            //Delay para saber quando soltar
             digitalWrite(OUTPUT_S1,HIGH);
-            delay(1000);
+            delay(3000);
             digitalWrite(OUTPUT_S1,LOW);
             defeito_v1 = 0;
-            cont_reprovadas ++;            
+            cont_reprovadas ++;
         }
         else if (defeito_v1 == 0 && defeito_v2 == 1) {
             digitalWrite(OUTPUT_S2,HIGH);
-            delay(1000);
+            delay(3000);
             digitalWrite(OUTPUT_S2,LOW);
             defeito_v2 = 0;
-            cont_reprovadas ++;            
+            cont_reprovadas ++;
         }
         else if (defeito_v1 == 1 && defeito_v2 == 1) {
             digitalWrite(OUTPUT_S1,HIGH);
-            digitalWrite(OUTPUT_S2,HIGH);
-            delay(1000);
+            delay(500);
+            digitalWrite(OUTPUT_S2,HIGH);            
+            delay(3000);           
             digitalWrite(OUTPUT_S1,LOW);
             digitalWrite(OUTPUT_S2,LOW);
             defeito_v1 = 0;
             defeito_v2 = 0;
-            cont_reprovadas += 2;            
+            cont_reprovadas += 2;
         }
         else if (defeito_v1 == 0 && defeito_v2 == 0) {
             cont_reprovadas = 0;
         }
-        if (cont_reprovadas >= 99999) { //pode colocar a constante NUMERO_MAXIMO_DE_REPROVACOES aqui
-            digitalWrite(OUTPUT_SR, LOW); //ATIVAR SIRENE
+        if (cont_reprovadas >= 10000) { //pode colocar a constante NUMERO_MAXIMO_DE_REPROVACOES aqui
+            digitalWrite(OUTPUT_SR, HIGH); //ATIVAR SIRENE
             Serial.println("w");
             cont_reprovadas = 0;       
         }
         while (analogRead(INPUT_E2) < 500) {} // Esperar o carro sair da área de checagem para a próxima etapa
-                etapa = 2;
-                
-                
+                etapa = 2;                                
     }
 }
 
 void primeira_inspecao() {
-    delay(300);
+    delay(1000);
     if (analogRead(INPUT_E2) < 500) { // Voltando para a área de checagem
-        delay(3000);
-
+        delay(1000);
         if (analogRead(INPUT_E4) > 500) {
             Serial.println("p");
         } else {
@@ -128,10 +126,9 @@ void primeira_inspecao() {
 
 
 void segunda_inspecao() {
-    delay(300);
+    delay(1000);
     if (analogRead(INPUT_E2) < 500) { // Voltando para a área de checagem
-        delay(3000);
-
+        delay(1000);
         if (analogRead(INPUT_E4) > 500) {
             Serial.println("p");
         } else {
