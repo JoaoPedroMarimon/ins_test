@@ -1,5 +1,7 @@
 import dataclasses
+from typing import Sequence
 
+import numpy as np
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QWidget, QSizePolicy
 
@@ -21,6 +23,7 @@ class InspectionVideo(
     def _config_video(self):
         self._video_preview.onVideonotOpened.connect(lambda: print("deu ruim"))
         self._video_preview.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        self.start_video()
 
     def _config_plate(self):
         self._inspection_result_plate.setGeometry(0, self.height()//2, self.width(), 80)
