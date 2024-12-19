@@ -48,7 +48,7 @@ class HMIReceiver(IPCServer, ABC):
         self._send_packet(Packet("0",PacketType.REQUEST,"frame_inspection",{"markers": markers}))
 
     def new_cycle(self) -> None:
-        self._send_packet(Packet("0",PacketType.REQUEST,"inspection", {"result":"new_cycle"}))
+        self._send_packet(Packet("0",PacketType.REQUEST,"new_cycle",{}))
 
     def get_model_index(self) -> int | None:
         return self._ihm_status['model']

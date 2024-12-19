@@ -54,8 +54,7 @@ class SecondScreen(QWidget, Ui_Form):
             markers_name = ", ".join(markers_name)
             self.label_placard.setText(markers_name)
 
-    def clean_placard(self, result):
-        if result is InspectionResult.APROVADO or result is InspectionResult.NOVO_CICLO:
+    def clean_placard(self):
             self.label_placard.setText("EQUIPE AUTOMAÇÃO - INTELBRAS")
 
     def set_name_switch(self, name_switch):
@@ -65,7 +64,7 @@ class SecondScreen(QWidget, Ui_Form):
         return self.model_label.text()
 
     def enum_to_history(self, result):
-        if self.is_history_full() and InspectionResult.NOVO_CICLO:
+        if self.is_history_full():
             self.clean_history()
         if result == InspectionResult.APROVADO:
             obj = self.queue_history.get()

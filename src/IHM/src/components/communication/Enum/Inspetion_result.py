@@ -6,14 +6,13 @@ class InspectionResult(Enum):
     NAO_INSPECIONADO = 0
     APROVADO = {"background": "#00A336", "color": "cor: #fff"}
     REPROVADO = {"background": "#ff0000", "color": "cor: #fff"}
-    NOVO_CICLO = 3
 
     @classmethod
     def convert_to_enum(cls, req) -> Enum:
         match req:
-            case "aprovado":
+            case "approved":
                 return InspectionResult.APROVADO
-            case "reprovado":
+            case "reproved":
                 return InspectionResult.REPROVADO
-            case "sem_inspecao":
+            case "no_inspection":
                 return InspectionResult.NAO_INSPECIONADO

@@ -23,7 +23,8 @@ class ControllerView(QObject):
         self._server = IHMClient()
         self._server.OnReceiveResult.connect(self.second_screen.enum_to_history)
         self._server.OnReceiveResult.connect(self.second_screen.mostrar_aprovado_reprovado)
-        self._server.OnReceiveResult.connect(self.second_screen.clean_placard)
+        self._server.OnNewCicle.connect(self.second_screen.clean_placard)
+        self._server.OnNewCicle.connect(self.second_screen.clean_history)
         self._server.OpenLimitExceed.connect(self.open_limit_exceed)
         self._server.OnReceiveFrame.connect(self.second_screen.set_markers_on_placard)
 
