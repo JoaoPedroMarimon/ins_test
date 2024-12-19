@@ -12,4 +12,6 @@ class MessageController:
                 return InspectionResult.REPROVADO
             case "no_inspection":
                 return InspectionResult.NAO_INSPECIONADO
+            case "new_cycle":
+                return InspectionResult.NOVO_CICLO
 

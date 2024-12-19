@@ -1,5 +1,9 @@
 from abc import ABC
 from threading import Thread
+
+import numpy as np
+from numpy.random.mtrand import Sequence
+
 from src.IHM.src.components.communication.interfaces.ipc_server import IPCServer
 from src.IHM.src.components.communication.packet.utils import BASE_PACKET_SCHEMA
 from src.IHM.src.components.communication.packet.packet import Packet, PacketType
@@ -32,7 +36,6 @@ class HMIReceiver(IPCServer, ABC):
             match packet.message:
                 case 'get_model':
                     self._ihm_status.update(packet.body)
-                    break
                 case "button_continue":
                     self._ihm_status["button"] = packet.body['status']
     def send_approved(self) -> None:
@@ -40,6 +43,12 @@ class HMIReceiver(IPCServer, ABC):
 
     def send_reproved(self) -> None:
         self._send_packet(Packet("0",PacketType.REQUEST,"inspection", {"result":"reproved"}))
+
+    def send_inspect_frame(self,markers):
+        self._send_packet(Packet("0",PacketType.REQUEST,"frame_inspection",{"markers": markers}))
+
+    def new_cycle(self) -> None:
+        self._send_packet(Packet("0",PacketType.REQUEST,"inspection", {"result":"new_cycle"}))
 
     def get_model_index(self) -> int | None:
         return self._ihm_status['model']
@@ -54,3 +63,4 @@ class HMIReceiver(IPCServer, ABC):
         super().start()
         self._receive_packet_handler_thread = Thread(target=self.packet_receiver,daemon=True)
         self._receive_packet_handler_thread.start()
+

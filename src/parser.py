@@ -3,10 +3,11 @@ import argparse
 import re
 from argparse import ArgumentParser
 
+from main import inspecionar_frame
 from .serial_connection import SerialController
 from . import environment as env
 from . import utils
-#from .inspection_designer.inspection_designer import inspection
+from .inspection_designer.inspection_designer import inspection
 
 
 class NotAProductError(Exception):
@@ -54,11 +55,13 @@ def main_parse():
     add_parser = subparser.add_parser("add", help="Adiciona um novo produto no arquivo.")
     add_parser.add_argument("name", type=str, help="Nome do produto, sem caracteres especiais.")
     add_parser.add_argument("code", type=str, help="Código do produto.")
+    add_parser.add_argument("status", type=str, help="Status da inspecao.")
 
     edit_parser = subparser.add_parser("edit", help="Edita um produto existente no arquivo.")
     group = edit_parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-n", "--name", type=str, help="Nome de um produto existente no arquivo.")
     group.add_argument("-c", "--code", type=str, help="Código de um produto existente no arquivo.")
+    group.add_argument("-s", "--status", type=str, help="Status da inspecao.")
 
     del_parser = subparser.add_parser("del", help='Apaga um produto existente do arquivo, além de suas pastas.')
     group = del_parser.add_mutually_exclusive_group(required=True)
@@ -114,6 +117,7 @@ def execute_parse(args) -> None:
     if args.subparser == "add":
         product_data = {"name": args.name.upper().replace(" ", ""),
                         "code": args.code,
+                        "status": args.status.upper().replace(" ", ""),
                         "pad-inspection": {"active": True, "classes": []}}
 
         config["products"].append(product_data)
@@ -136,16 +140,16 @@ def execute_parse(args) -> None:
         product_data = get_product_from_configfile(args.code, args.name, config)
 
         if args.inspection == "pad-inspection":
-            inspection_obj = inspection.PadInspection(templates_path=f"./templates/{product_data['name']}")
+            inspection_obj = inspection.TemplateInspection(templates_path=f"./samples/{product_data['name']}/templates")
 
-        inspection_obj.config = product_data[args.inspection]
-        window = inspection_obj.designer(product_data['name'])
-        window.load_video_source(utils.get_rtsp_url(**config["camera"]))
-        do_save = window.mainloop()
-        if do_save:
-            utils.dump_json_configfile(env.CONFIGFILE_PATHNAME, config)
-            logging.warning(f"|INSPECT| Produto '{product_data['name']}' teve inspeções"
-                            f" do tipo {args.inspection} atualizadas.")
+            inspection_obj.config = product_data[args.inspection]
+            window = inspection_obj.load_designer(product_data['name'])
+      #      window.load_video_source(utils.get_rtsp_url(**config["camera"]))
+            do_save = window.mainloop()
+            if do_save:
+                utils.dump_json_configfile(env.CONFIGFILE_PATHNAME, config)
+                logging.warning(f"|INSPECT| Produto '{product_data['name']}' teve inspeções"
+                                f" do tipo {args.inspection} atualizadas.")
 
     elif args.subparser == "clone":
         target_product_data = get_product_from_configfile(args.target_code, args.target_name, config)

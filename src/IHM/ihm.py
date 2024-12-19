@@ -1,3 +1,7 @@
+from typing import Sequence
+
+import numpy as np
+
 from src.IHM.hmi_receiver import HMIReceiver
 from .interface import Interface
 
@@ -10,7 +14,8 @@ class Singleton:
             cls._instance = super(Singleton, cls).__new__(cls)
         return cls._instance
 
-class IHM(Singleton,Interface):
+
+class IHM(Singleton, Interface):
     def __init__(self, products_list: list):
         super().__init__(products_list)
         self._server = HMIReceiver()
@@ -32,3 +37,14 @@ class IHM(Singleton,Interface):
     def open_limit_exceed_screen(self):
         self._server.open_limit_exceed_screen()
 
+    def send_approved(self) -> None:
+        self._server.send_approved()
+
+    def send_reproved(self) -> None:
+        self._server.send_reproved()
+
+    def send_markers(self, markers):
+        self._server.send_inspect_frame(markers)
+
+    def new_cycle(self) -> None:
+        self._server.new_cycle()
