@@ -38,6 +38,7 @@ bool enviado = false;
 void aguarda_inicio() {
     if(analogRead(INPUT_E1) < 500) {
         delay(500);
+        Serial.println("k");
         etapa = 1;
     }
 }
