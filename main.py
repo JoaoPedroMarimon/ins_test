@@ -155,11 +155,10 @@ def main():
                     read = ser.readline().strip(b"\r\n")
                     print(f"Recebido: {read}")
 
-                    if read == b"p" or read == b"s":
+                    if read == b"p1" or read == b"p2":
                         frame = capturar_frame(camera)
                         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                        posicao = "posicao_1" if read == b"p" else "posicao_2"
-
+                        posicao = "posicao_1" if read == b"p1" else "posicao_2"
                         if status == 'A':
                             salvar_imagem(frame, produto_config['name'], posicao, "geral/sem_clasif", timestamp)
                         elif status == 'B':
@@ -170,7 +169,6 @@ def main():
                             frame_processado,_, inspecao_ok = inspecionar_frame(frame, pad_inspec)
                             classificar_resultado(inspecao_ok)
                             ihm.send_approved() if inspecao_ok else ihm.send_reproved()
-
                             ser.write(b'o' if inspecao_ok else b'n')
                         elif status == 'D':
                             frame_processado, markers, inspecao_ok = inspecionar_frame(frame, pad_inspec)

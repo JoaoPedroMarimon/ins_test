@@ -65,7 +65,7 @@ class SecondScreen(QWidget, Ui_Form):
         return self.model_label.text()
 
     def enum_to_history(self, result):
-        if self.is_history_full():
+        if self.is_history_full() and InspectionResult.NOVO_CICLO:
             self.clean_history()
         if result == InspectionResult.APROVADO:
             obj = self.queue_history.get()
@@ -78,10 +78,7 @@ class SecondScreen(QWidget, Ui_Form):
             obj.setText('REPROVADO')
             obj.setStyleSheet("background-color: #ff0000; color: white;")
             self.queue_history.put(obj)  # Coloca o objeto de volta na fila
-        else:
-            obj = self.queue_history.get()
-            obj.setText("INSPECIONANDO...")
-            obj.setStyleSheet("background-color: yellow")
+
 
 
 
