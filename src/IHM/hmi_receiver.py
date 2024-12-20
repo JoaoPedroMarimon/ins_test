@@ -44,8 +44,8 @@ class HMIReceiver(IPCServer, ABC):
     def send_reproved(self,position: str) -> None:
         self._send_packet(Packet("0",PacketType.REQUEST,"inspection", {"position": position,"result":"reproved"}))
 
-    def send_inspect_frame(self,markers):
-        self._send_packet(Packet("0",PacketType.REQUEST,"frame_inspection",{"markers": markers}))
+    def send_inspect_frame(self,position:str,markers):
+        self._send_packet(Packet("0",PacketType.REQUEST,"frame_inspection",{"position":position,"markers": markers}))
 
     def new_cycle(self) -> None:
         self._send_packet(Packet("0",PacketType.REQUEST,"new_cycle",{}))
