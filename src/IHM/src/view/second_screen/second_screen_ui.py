@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'second_screen.ui'
+## Form generated from reading UI file 'second_widget.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -22,13 +22,13 @@ class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(952, 591)
+        Form.resize(898, 515)
         self.verticalLayout = QVBoxLayout(Form)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, -1, 0, -1)
         self.widget = QWidget(Form)
         self.widget.setObjectName(u"widget")
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(3)
         sizePolicy.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
@@ -36,7 +36,7 @@ class Ui_Form(object):
         self.horizontalLayout_2 = QHBoxLayout(self.widget)
         self.horizontalLayout_2.setSpacing(3)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_2.setContentsMargins(0, 0, 5, 0)
         self.widget_3 = QWidget(self.widget)
         self.widget_3.setObjectName(u"widget_3")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
@@ -81,50 +81,18 @@ class Ui_Form(object):
 
         self.verticalLayout_2.addWidget(self.label_2)
 
-        self.widget_5 = QWidget(self.widget_3)
-        self.widget_5.setObjectName(u"widget_5")
+        self.hist_container = QWidget(self.widget_3)
+        self.hist_container.setObjectName(u"hist_container")
         sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy4.setHorizontalStretch(0)
         sizePolicy4.setVerticalStretch(10)
-        sizePolicy4.setHeightForWidth(self.widget_5.sizePolicy().hasHeightForWidth())
-        self.widget_5.setSizePolicy(sizePolicy4)
-        self.widget_5.setStyleSheet(u"background-color: rgb(222, 221, 218);")
-        self.verticalLayout_3 = QVBoxLayout(self.widget_5)
+        sizePolicy4.setHeightForWidth(self.hist_container.sizePolicy().hasHeightForWidth())
+        self.hist_container.setSizePolicy(sizePolicy4)
+        self.hist_container.setStyleSheet(u"background-color: rgb(222, 221, 218);")
+        self.verticalLayout_3 = QVBoxLayout(self.hist_container)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.widget_4 = QWidget(self.widget_5)
-        self.widget_4.setObjectName(u"widget_4")
-        self.verticalLayout_4 = QVBoxLayout(self.widget_4)
-        self.verticalLayout_4.setSpacing(0)
-        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
-        self.label_hist_one = QLabel(self.widget_4)
-        self.label_hist_one.setObjectName(u"label_hist_one")
-        self.label_hist_one.setStyleSheet(u"background-color: rgb(248, 228, 92);")
-        self.label_hist_one.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.verticalLayout_4.addWidget(self.label_hist_one)
-
-
-        self.verticalLayout_3.addWidget(self.widget_4)
-
-        self.widget_6 = QWidget(self.widget_5)
-        self.widget_6.setObjectName(u"widget_6")
-        self.verticalLayout_5 = QVBoxLayout(self.widget_6)
-        self.verticalLayout_5.setSpacing(0)
-        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
-        self.label_hist_two = QLabel(self.widget_6)
-        self.label_hist_two.setObjectName(u"label_hist_two")
-        self.label_hist_two.setStyleSheet(u"background-color: rgb(248, 228, 92);")
-        self.label_hist_two.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.verticalLayout_5.addWidget(self.label_hist_two)
-
-
-        self.verticalLayout_3.addWidget(self.widget_6)
-
-
-        self.verticalLayout_2.addWidget(self.widget_5)
+        self.verticalLayout_2.addWidget(self.hist_container)
 
         self.model_label = QLabel(self.widget_3)
         self.model_label.setObjectName(u"model_label")
@@ -145,15 +113,13 @@ class Ui_Form(object):
         self.video_place = QWidget(self.widget)
         self.video_place.setObjectName(u"video_place")
         sizePolicy6 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
-        sizePolicy6.setHorizontalStretch(3)
+        sizePolicy6.setHorizontalStretch(4)
         sizePolicy6.setVerticalStretch(0)
         sizePolicy6.setHeightForWidth(self.video_place.sizePolicy().hasHeightForWidth())
         self.video_place.setSizePolicy(sizePolicy6)
         self.video_place.setStyleSheet(u"background-color: rgb(36, 31, 49);")
         self.horizontalLayout_3 = QHBoxLayout(self.video_place)
-        self.horizontalLayout_3.setSpacing(0)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
 
         self.horizontalLayout_2.addWidget(self.video_place)
 
@@ -169,13 +135,20 @@ class Ui_Form(object):
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.label_placard = QLabel(self.widget_2)
         self.label_placard.setObjectName(u"label_placard")
+        sizePolicy7 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Preferred)
+        sizePolicy7.setHorizontalStretch(0)
+        sizePolicy7.setVerticalStretch(0)
+        sizePolicy7.setHeightForWidth(self.label_placard.sizePolicy().hasHeightForWidth())
+        self.label_placard.setSizePolicy(sizePolicy7)
         font = QFont()
-        font.setPointSize(16)
+        font.setPointSize(11)
         font.setBold(False)
         self.label_placard.setFont(font)
         self.label_placard.setStyleSheet(u"color: rgb(255, 255, 255);\n"
 "background-color: rgb(53, 132, 228);")
         self.label_placard.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.label_placard.setWordWrap(True)
+        self.label_placard.setMargin(5)
 
         self.horizontalLayout.addWidget(self.label_placard)
 
@@ -193,8 +166,6 @@ class Ui_Form(object):
         self.button_to_model_screen.setText(QCoreApplication.translate("Form", u"VOLTAR PARA MODELOS", None))
         self.label_3.setText(QCoreApplication.translate("Form", u"HIST\u00d3RICO", None))
         self.label_2.setText(QCoreApplication.translate("Form", u"\u00daLTIMAS DUAS PE\u00c7AS", None))
-        self.label_hist_one.setText(QCoreApplication.translate("Form", u"INSPECIONANDO....", None))
-        self.label_hist_two.setText(QCoreApplication.translate("Form", u"INSPECIONANDO....", None))
         self.model_label.setText(QCoreApplication.translate("Form", u"MODEL SWITCH", None))
         self.label_placard.setText(QCoreApplication.translate("Form", u"EQUIPE AUTOMA\u00c7\u00c3O - INTELBRAS", None))
     # retranslateUi

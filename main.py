@@ -150,7 +150,7 @@ def main():
             status = produto_config['status']
 
             # Laço contínuo para monitorar a comunicação serial
-            while index_modelo is not None:
+            while index_modelo is not None and ihm.is_alive():
                 if ser.in_waiting > 0:
                     read = ser.readline().strip(b"\r\n")
                     print(f"Recebido: {read}")
@@ -168,7 +168,7 @@ def main():
                         elif status == 'C':
                             frame_processado,_, inspecao_ok = inspecionar_frame(frame, pad_inspec)
                             classificar_resultado(inspecao_ok)
-                            ihm.send_approved() if inspecao_ok else ihm.send_reproved()
+                            ihm.send_approved(posicao) if inspecao_ok else ihm.send_reproved(posicao)
                             ser.write(b'o' if inspecao_ok else b'n')
                         elif status == 'D':
                             frame_processado, markers, inspecao_ok = inspecionar_frame(frame, pad_inspec)
@@ -177,7 +177,7 @@ def main():
                             print("inspeção: ",inspecao_ok)
                             salvar_imagem(frame, produto_config['name'], posicao, pasta, timestamp)
                             ihm.send_markers(markers)
-                            ihm.send_approved() if inspecao_ok else ihm.send_reproved()
+                            ihm.send_approved(posicao) if inspecao_ok else ihm.send_reproved(posicao)
                             ser.write(b'o' if inspecao_ok else b'n')
 
                     elif read == b"w":

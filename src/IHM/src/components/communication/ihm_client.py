@@ -8,13 +8,13 @@ from src.IHM.src.components.communication.Enum.Inspetion_result import Inspectio
 from src.IHM.src.components.communication.packet.packet import Packet
 from src.IHM.src.components.communication.packet.packet import PacketType
 from src.IHM.src.components.communication.packet.utils import BASE_PACKET_SCHEMA
-from src.IHM.src.components.communication.message_controller import MessageController
 
 
 class IHMClient(QtIPCClient, ABC):
-    OnReceiveResult = Signal(InspectionResult)
+    OnReceiveResult = Signal(str,InspectionResult)
     OpenLimitExceed = Signal()
     OnReceiveFrame = Signal(dict)
+    OnNewCicle = Signal()
     def __init__(self):
         super().__init__(address="/tmp/IHM",packet_schema=BASE_PACKET_SCHEMA)
         self.packetReceivedSig.connect(self.react_packet)
@@ -33,11 +33,13 @@ class IHMClient(QtIPCClient, ABC):
     def react_packet(self, packet: Packet) -> None:
         match packet.message:
             case "inspection":
-                self.OnReceiveResult.emit(MessageController.convert_result_to_enum(packet.body["result"]))
+                self.OnReceiveResult.emit(packet.body["position"],InspectionResult.convert_to_enum(packet.body["result"]))
             case "limit_exceed":
                 self.OpenLimitExceed.emit()
             case "frame_inspection":
                 self.OnReceiveFrame.emit(packet.body)
+            case "new_cycle":
+                self.OnNewCicle.emit()
 
 
     def close(self):
