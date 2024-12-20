@@ -111,15 +111,16 @@ def classificar_resultado(inspecao_ok):
 
 def main():
 
-    args = src.main_parse()
-    src.init_logging(logging.WARNING, stream_handler=True, log_directory=".", debug=args.debug)
-    logging.warning(f"init with {args}")
-
-    if args.subparser is not None or args.serial_data:
-        src.execute_parse(args)
-        return
-
-    ser = verificar_conexao_serial(args)
+    # args = src.main_parse()
+    # src.init_logging(logging.WARNING, stream_handler=True, log_directory=".", debug=args.debug)
+    # logging.warning(f"init with {args}")
+    #
+    # if args.subparser is not None or args.serial_data:
+    #     src.execute_parse(args)
+    #     return
+    #
+    # ser = verificar_conexao_serial(args)
+    ser = Arduino()
     camera = verificar_conexao_camera(src.DEFAULT_CONFIGFILE["camera"])
     config = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
 
@@ -152,19 +153,21 @@ def main():
             # Laço contínuo para monitorar a comunicação serial
             while index_modelo is not None and ihm.is_alive():
                 if ser.in_waiting > 0:
-                    read = ser.readline().strip(b"\r\n")
+                    # read = ser.readline().strip(b"\r\n")
+                    read = ser.read_line()
                     print(f"Recebido: {read}")
 
                     if read == b"p1" or read == b"p2":
                         frame = capturar_frame(camera)
                         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                        posicao = "posicao_1" if read == b"p1" else "posicao_2"
+                        posicao_pasta = "posicao_1" if read == b"p1" else "posicao_2"
+                        posicao = "Posição 1" if read == b"p1" else "Posição 2"
                         if status == 'A':
-                            salvar_imagem(frame, produto_config['name'], posicao, "geral/sem_clasif", timestamp)
+                            salvar_imagem(frame, produto_config['name'], posicao_pasta, "geral/sem_clasif", timestamp)
                         elif status == 'B':
                             frame_processado,_, inspecao_ok = inspecionar_frame(frame, pad_inspec)
                             pasta = "geral/com_clasif/ok" if inspecao_ok else "geral/com_clasif/nok"
-                            salvar_imagem(frame, produto_config['name'], posicao, pasta, timestamp)
+                            salvar_imagem(frame, produto_config['name'], posicao_pasta, pasta, timestamp)
                         elif status == 'C':
                             frame_processado,_, inspecao_ok = inspecionar_frame(frame, pad_inspec)
                             classificar_resultado(inspecao_ok)
@@ -175,8 +178,8 @@ def main():
                             classificar_resultado(inspecao_ok)
                             pasta = "teste/ok" if inspecao_ok else "teste/nok"
                             print("inspeção: ",inspecao_ok)
-                            salvar_imagem(frame, produto_config['name'], posicao, pasta, timestamp)
-                            ihm.send_markers(markers)
+                            salvar_imagem(frame, produto_config['name'], posicao_pasta, pasta, timestamp)
+                            ihm.send_markers(posicao,markers)
                             ihm.send_approved(posicao) if inspecao_ok else ihm.send_reproved(posicao)
                             ser.write(b'o' if inspecao_ok else b'n')
 
