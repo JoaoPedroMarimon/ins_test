@@ -38,11 +38,11 @@ class HMIReceiver(IPCServer, ABC):
                     self._ihm_status.update(packet.body)
                 case "button_continue":
                     self._ihm_status["button"] = packet.body['status']
-    def send_approved(self) -> None:
-        self._send_packet(Packet("0",PacketType.REQUEST,"inspection", {"result":"approved"}))
+    def send_approved(self,position: str) -> None:
+        self._send_packet(Packet("0",PacketType.REQUEST,"inspection", {"position": position ,"result":"approved"}))
 
-    def send_reproved(self) -> None:
-        self._send_packet(Packet("0",PacketType.REQUEST,"inspection", {"result":"reproved"}))
+    def send_reproved(self,position: str) -> None:
+        self._send_packet(Packet("0",PacketType.REQUEST,"inspection", {"position": position,"result":"reproved"}))
 
     def send_inspect_frame(self,markers):
         self._send_packet(Packet("0",PacketType.REQUEST,"frame_inspection",{"markers": markers}))

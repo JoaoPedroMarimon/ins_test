@@ -21,10 +21,10 @@ class ControllerView(QObject):
         self.signals_limit_screen()
     def __config_server(self):
         self._server = IHMClient()
-        self._server.OnReceiveResult.connect(self.second_screen.enum_to_history)
+        self._server.OnReceiveResult.connect(self.second_screen.history.receive_result)
         self._server.OnReceiveResult.connect(self.second_screen.mostrar_aprovado_reprovado)
         self._server.OnNewCicle.connect(self.second_screen.clean_placard)
-        self._server.OnNewCicle.connect(self.second_screen.clean_history)
+        self._server.OnNewCicle.connect(self.second_screen.history.clean_history)
         self._server.OpenLimitExceed.connect(self.open_limit_exceed)
         self._server.OnReceiveFrame.connect(self.second_screen.set_markers_on_placard)
 
@@ -49,7 +49,7 @@ class ControllerView(QObject):
         self.first_screen.setVisible(True)
 
     def open_second_screen(self) -> None:
-        self.second_screen.clean_history()
+        self.second_screen.history.clean_history()
         self.second_screen.setVisible(True)
 
     def open_limit_exceed(self):
