@@ -111,16 +111,15 @@ def classificar_resultado(inspecao_ok):
 
 def main():
 
-    # args = src.main_parse()
-    # src.init_logging(logging.WARNING, stream_handler=True, log_directory=".", debug=args.debug)
-    # logging.warning(f"init with {args}")
-    #
-    # if args.subparser is not None or args.serial_data:
-    #     src.execute_parse(args)
-    #     return
-    #
-    # ser = verificar_conexao_serial(args)
-    ser = Arduino()
+    args = src.main_parse()
+    src.init_logging(logging.WARNING, stream_handler=True, log_directory=".", debug=args.debug)
+    logging.warning(f"init with {args}")
+
+    if args.subparser is not None or args.serial_data:
+        src.execute_parse(args)
+        return
+
+    ser = verificar_conexao_serial(args)
     camera = verificar_conexao_camera(src.DEFAULT_CONFIGFILE["camera"])
     config = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
 
@@ -153,8 +152,7 @@ def main():
             # Laço contínuo para monitorar a comunicação serial
             while index_modelo is not None and ihm.is_alive():
                 if ser.in_waiting > 0:
-                    # read = ser.readline().strip(b"\r\n")
-                    read = ser.read_line()
+                    read = ser.readline().strip(b"\r\n")
                     print(f"Recebido: {read}")
 
                     if read == b"p1" or read == b"p2":
