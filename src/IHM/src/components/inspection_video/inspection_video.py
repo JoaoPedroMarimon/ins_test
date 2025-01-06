@@ -21,7 +21,7 @@ class InspectionVideo(
 
 
     def _config_video(self):
-        self._video_preview.onVideonotOpened.connect(lambda: print("deu ruim"))
+        self._video_preview.onVideonotOpened.connect(lambda: print("O vídeo não pode ser carregado"))
         self._video_preview.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         self.start_video()
 
@@ -33,7 +33,7 @@ class InspectionVideo(
 
     def approved_plate(self):
         self._inspection_result_plate.approved()
-    def repproved_plate(self):
+    def reproved_plate(self):
         self._inspection_result_plate.reproved()
 
 

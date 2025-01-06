@@ -79,7 +79,7 @@ class SecondScreen(QWidget, Ui_Form):
             self.video.approved_plate()
 
         elif resultado == InspectionResult.REPROVADO:
-            self.video.repproved_plate()
+            self.video.reproved_plate()
 
 
     def closeEvent(self, event):

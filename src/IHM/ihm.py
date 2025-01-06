@@ -4,6 +4,7 @@ import numpy as np
 
 from src.IHM.hmi_receiver import HMIReceiver
 from .interface import Interface
+from .src.config import Config
 
 
 class Singleton:
@@ -16,10 +17,10 @@ class Singleton:
 
 
 class IHM(Singleton, Interface):
-    def __init__(self, products_list: list):
-        super().__init__(products_list)
+    def __init__(self, config_json):
+        super().__init__()
         self._server = HMIReceiver()
-
+        Config(config_json)
     def run_ihm(self):
         super()._run_interface()
 

@@ -10,7 +10,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     modelSig = Signal(str)
     OpenSecondScreen = Signal()
     OnClose = Signal()
-    def __init__(self, product_json:list):
+    def __init__(self, product_json):
         super(MainWindow, self).__init__()
         self.setupUi(self)
         button_list = [self.button_model_a_2,self.button_model_b_2,self.button_model_c_2,self.button_model_d_2]
