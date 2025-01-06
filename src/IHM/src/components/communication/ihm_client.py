@@ -13,7 +13,7 @@ from src.IHM.src.components.communication.packet.utils import BASE_PACKET_SCHEMA
 class IHMClient(QtIPCClient, ABC):
     OnReceiveResult = Signal(str,InspectionResult)
     OpenLimitExceed = Signal()
-    OnReceiveFrame = Signal(dict)
+    OnReceiveFrame = Signal(str,list)
     OnNewCicle = Signal()
     def __init__(self):
         super().__init__(address="/tmp/IHM",packet_schema=BASE_PACKET_SCHEMA)
@@ -37,7 +37,7 @@ class IHMClient(QtIPCClient, ABC):
             case "limit_exceed":
                 self.OpenLimitExceed.emit()
             case "frame_inspection":
-                self.OnReceiveFrame.emit(packet.body)
+                self.OnReceiveFrame.emit(packet.body["position"],packet.body["markers"])
             case "new_cycle":
                 self.OnNewCicle.emit()
 

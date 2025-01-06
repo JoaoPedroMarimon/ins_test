@@ -43,8 +43,8 @@ class IHM(Singleton, Interface):
     def send_reproved(self,position: str) -> None:
         self._server.send_reproved(position)
 
-    def send_markers(self, markers):
-        self._server.send_inspect_frame(markers)
+    def send_markers(self,position: str, markers):
+        self._server.send_inspect_frame(position,markers)
 
     def new_cycle(self) -> None:
         self._server.new_cycle()

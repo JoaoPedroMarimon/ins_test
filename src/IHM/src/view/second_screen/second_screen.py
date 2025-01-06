@@ -1,5 +1,7 @@
 import time
 
+from PySide6.QtGui import QFont
+
 from src.IHM.src.components.history.history import History
 from src.IHM.src.components.inspection_return.inspection_return import InspectionReturn
 from src.IHM.src.components.inspection_video.inspection_video import InspectionVideo
@@ -7,7 +9,6 @@ from src.IHM.src.components.video_preview.video_preview import VideoPreview
 import queue
 
 from src.IHM.src.view.second_screen.second_screen_ui import Ui_Form
-from src.IHM.src.view.second_screen.ui_second_screen import Ui_MainWindow
 from PySide6.QtWidgets import (QMainWindow, QSizePolicy, QVBoxLayout, QWidget)
 from PySide6.QtCore import QTimer, Signal
 
@@ -28,6 +29,7 @@ class SecondScreen(QWidget, Ui_Form):
         self.setVisible(False)
 
     def __config_components(self):
+        self.clean_placard()
         self.confing_history()
         self.__config_video()
         self.button_to_model_screen.clicked.connect(self.to_first_screen)
@@ -46,14 +48,23 @@ class SecondScreen(QWidget, Ui_Form):
         self.history.clean_history()
         self.OpenFirstScreen.emit()
 
-    def set_markers_on_placard(self,markers_list):
+    def set_markers_on_placard(self,postion:str,markers_list):
+        new_font = self.label_placard.font()
+        new_font.setPointSize(11)
+        self.label_placard.setFont(new_font)
+
         if markers_list is not None:
-            print(markers_list)
-            markers_name = [makers["name"] for makers in markers_list["markers"]]
+            markers_name = [makers["name"] for makers in markers_list]
             markers_name = ", ".join(markers_name)
-            self.label_placard.setText(markers_name)
+            if self.label_placard.text() == "EQUIPE AUTOMAÇÃO - INTELBRAS":
+                self.label_placard.setText(f"{postion}: {markers_name}\n\n")
+            else:
+                self.label_placard.setText(f"{self.label_placard.text()}{postion}: {markers_name}")
 
     def clean_placard(self):
+            new_font = self.label_placard.font()
+            new_font.setPointSize(16)
+            self.label_placard.setFont(new_font)
             self.label_placard.setText("EQUIPE AUTOMAÇÃO - INTELBRAS")
 
     def set_name_switch(self, name_switch):
@@ -61,43 +72,6 @@ class SecondScreen(QWidget, Ui_Form):
 
     def get_name_switch(self):
         return self.model_label.text()
-
-    # def enum_to_history(self, position: str,result: InspectionResult):
-    #     if self.is_history_full():
-    #         self.clean_history()
-    #
-    #     hist = self.queue_history.get()
-    #     hist_position = hist[0]
-    #     hist_position.setText(position)
-    #     hist_result = hist[1]
-    #     if result == InspectionResult.APROVADO:
-    #         hist_result.setText('APROVADO')
-    #         hist.setStyleSheet("background-color: #00A336; color: white;")
-    #
-    #
-    #     elif result == InspectionResult.REPROVADO:
-    #         hist_result.setText('REPROVADO')
-    #         hist_result.setStyleSheet("background-color: #ff0000; color: white;")
-    #         hist_position.setStyleSheet("background-color: #ff0000; color: white;")
-    #
-    #     self.queue_history.put(hist)  # Coloca o objeto de volta na fila
-    #
-    #
-    # def clean_history(self):
-    #     for _ in range(0, self.queue_history.qsize()):
-    #         hist = self.queue_history.get()
-    #         hist_position = hist[0]
-    #         hist_position.setText("")
-    #         hist_result = hist[1]
-    #         hist_result.setText("INSPECIONANDO...")
-    #         hist_result.setStyleSheet("background-color: yellow")
-    #         hist_position.setStyleSheet("background-color: yellow")
-    #     self.confing_history()
-    #
-    # def is_history_full(self) -> bool:
-    #     if self.result.text() != "INSPECIONANDO..." and self.result_2.text() != "INSPECIONANDO...":
-    #         return True
-    #     return False
 
 
     def mostrar_aprovado_reprovado(self, resultado: InspectionResult):
