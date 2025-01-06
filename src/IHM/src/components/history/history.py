@@ -32,7 +32,6 @@ class History(QWidget,Ui_Form):
     def _config_logs(self):
         if self.queue_history is None:
             self.queue_history = queue.Queue()
-            print(self.hist_two.children()[1])
         self.queue_history.put(Logs(self.hist_one,self.hist_one.children()[1],self.hist_one.children()[2]))
         self.queue_history.put(Logs(self.hist_two,self.hist_two.children()[1],self.hist_two.children()[2]))
 

@@ -1,3 +1,5 @@
+from distutils.command.config import config
+
 import cv2
 import numpy as np
 import qimage2ndarray
@@ -6,6 +8,7 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QWidget, QVBoxLayout
 from src.IHM.src.components.video_preview.videoqthread import VideoQThread, get_rtsp_url
 from src.IHM.src.components.video_preview.photo_viewer import PhotoViewer
+from src.IHM.src.config import Config
 
 
 class VideoPreview(QWidget):
@@ -17,12 +20,16 @@ class VideoPreview(QWidget):
          passing the images and setting in Photoviewer
         """
         super().__init__(parent)
-        self._creating_instances()
+        _config = Config()
+        self._creating_instances(_config.get_camera_config())
         self._adjusting_photo_viewer()
 
-    def _creating_instances(self):
+    def _creating_instances(self, config_camera:dict = None):
         self.video_thread = None
-        self._camera_source = get_rtsp_url("192.168.1.108","admin","admin123",subtype=1)
+        if config_camera is None:
+            self._camera_source = get_rtsp_url("192.168.1.108", "admin", "admin123", subtype=1)
+        else:
+            self._camera_source = get_rtsp_url(**config_camera)
         self._size: tuple[int, int] = (self.parent().height(),self.parent().width())
         self.photo_viewer = PhotoViewer(self)
 
