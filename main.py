@@ -120,8 +120,8 @@ def main():
         return
 
     ser = verificar_conexao_serial(args)
-    camera = verificar_conexao_camera(src.DEFAULT_CONFIGFILE["camera"])
     config = src.load_json_configfile(src.CONFIGFILE_PATHNAME, src.DEFAULT_CONFIGFILE)
+    camera = verificar_conexao_camera(config["camera"])
 
     pad_inspec = src.TemplateInspection()
 
@@ -129,7 +129,7 @@ def main():
     for index, produto in enumerate(config['products']):
         print(f"Posição: {index}, Nome do produto: {produto['name']}")
 
-    ihm = src.IHM(config['products'])
+    ihm = src.IHM(config)
     ihm.run_ihm()
 
     while ihm.is_alive():
