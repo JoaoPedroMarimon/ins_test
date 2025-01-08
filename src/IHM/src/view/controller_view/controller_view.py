@@ -2,6 +2,7 @@ from operator import index
 
 from PySide6.QtCore import QObject
 
+from src.IHM.src.config import Config
 from src.IHM.src.view.limit_exceed_screen.limit_exceed import LimitExceed
 from src.IHM.src.view.first_screen.main_window import MainWindow
 from src.IHM.src.view.second_screen.second_screen import SecondScreen
@@ -9,10 +10,11 @@ from src.IHM.src.components.communication.ihm_client import IHMClient
 
 
 class ControllerView(QObject):
-    def __init__(self,product_json:list):
+    def __init__(self,):
         super().__init__()
-        self.__product_json = product_json
-        self.first_screen = MainWindow(product_json=product_json)
+        config = Config()
+        self.__product_json = config.get_products()
+        self.first_screen = MainWindow(product_json=self.__product_json)
         self.second_screen = SecondScreen()
         self.limit_screen = LimitExceed()
         self.__config_server()
@@ -69,11 +71,9 @@ class ControllerView(QObject):
     def get_switch_model(self) -> str:
         return self.second_screen.get_name_switch()
 
-    def get_status_button_continue(self):
-        return self.limit_screen.has_user_clicked_continue()
 
-    def send_packet_button_continue(self):
-        self._server.send_status_button_continue(self.get_status_button_continue())
+    def send_packet_button_continue(self, continue_button_clicked: bool):
+        self._server.send_status_button_continue(continue_button_clicked)
 
     def on_close(self) -> None:
         self.first_screen.close()
