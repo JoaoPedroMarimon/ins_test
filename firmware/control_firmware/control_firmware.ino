@@ -19,21 +19,43 @@ Controle de Versões:
 #define INPUT_E3 A2 // Pino do botao reset do sinalizador (ENTRADA 3 - 24v)
 #define INPUT_E4 A3 // Pino do sensor de posição do gabarito (ENTRADA 4 - 24v)
 
-
 #define OUTPUT_S1 5 // Pino alimentacao solenoide valvula 1 (SAIDA 1)
 #define OUTPUT_S2 6 // Pino alimentacao solenoide valvula 2 (SAIDA 2)
 #define OUTPUT_S3 7 // Pino alimentacao liberar CLP (SAIDA 3)
 
-
 #define OUTPUT_SR 11 // Pino alimentacao torre sinalizacao (RELE) 
+
 
 int etapa = -1;
 int defeito_v1 = 1;
 int defeito_v2 = 1;
 int cont_reprovadas = 0;
-// const int NUMERO_MAXIMO_DE_REPROVACOES = ; Isso fala sobre as quantidades máximas que a máquina irá aturar no sistema. Fica melhor numa constanste para facilitar mudanças futuras
-
 bool enviado = false;
+
+const int LIMITE_REPROVACAO = 5;
+bool result_list[10] = {0,0,0,0,0,0,0,0,0,0};
+unsigned int step = 0;
+
+void add_insp(bool resultado){
+  result_list[step] = resultado;
+  if (step == 10) {
+     step = 0;
+    } else {
+     step++;  
+    }
+  }
+bool alcansou_limite(){
+  int sum = 0;
+  for(int insp: result_list){
+    sum += insp;
+   }
+   if(sum >= LIMITE_REPROVACAO){
+    return true;
+    }
+    return false;
+  }
+
+  
 
 void aguarda_inicio() {
     if(analogRead(INPUT_E1) < 500) {
@@ -45,60 +67,69 @@ void aguarda_inicio() {
 
 void verifica_defeito() {
     delay(1000);
-    if (analogRead(INPUT_E2) < 500) {  // se o carro estiver no local de checagem, ou seja, liberado para o controlador soltar as placas defeituosas
-        if (defeito_v1 == 1 && defeito_v2 == 0) {
-            //Delay para saber quando soltar
+    if (analogRead(INPUT_E2) < 500) {
+      add_insp(defeito_v1);
+      add_insp(defeito_v2);
+        if (defeito_v1 == 1 && defeito_v2 == 0) {            
             digitalWrite(OUTPUT_S1,HIGH);
+            digitalWrite(OUTPUT_SR, HIGH);
             delay(3000);
             digitalWrite(OUTPUT_S1,LOW);
+            digitalWrite(OUTPUT_SR, LOW);
             defeito_v1 = 0;
-            cont_reprovadas ++;
+            cont_reprovadas ++;            
         }
         else if (defeito_v1 == 0 && defeito_v2 == 1) {
             digitalWrite(OUTPUT_S2,HIGH);
+            digitalWrite(OUTPUT_SR, HIGH);
             delay(3000);
             digitalWrite(OUTPUT_S2,LOW);
+            digitalWrite(OUTPUT_SR, LOW);
             defeito_v2 = 0;
-            cont_reprovadas ++;
+            cont_reprovadas ++;            
         }
-        else if (defeito_v1 == 1 && defeito_v2 == 1) {
+        else if (defeito_v1 == 1 && defeito_v2 == 1) { 
+                   
             digitalWrite(OUTPUT_S1,HIGH);
-            delay(500);
-            digitalWrite(OUTPUT_S2,HIGH);            
-            delay(3000);           
+            delay(100);
+            digitalWrite(OUTPUT_S2,HIGH);
+            digitalWrite(OUTPUT_SR,HIGH);
+            delay(3000);
             digitalWrite(OUTPUT_S1,LOW);
             digitalWrite(OUTPUT_S2,LOW);
+            digitalWrite(OUTPUT_SR,LOW);  
+            
             defeito_v1 = 0;
             defeito_v2 = 0;
-            cont_reprovadas += 2;
+            cont_reprovadas += 2;            
         }
-        else if (defeito_v1 == 0 && defeito_v2 == 0) {
-            cont_reprovadas = 0;
+        else if (defeito_v1 == 0 && defeito_v2 == 0) {                      
+           cont_reprovadas = 0;           
         }
-        if (cont_reprovadas >= 10000) { //pode colocar a constante NUMERO_MAXIMO_DE_REPROVACOES aqui
-            digitalWrite(OUTPUT_SR, HIGH); //ATIVAR SIRENE
+        
+        if (cont_reprovadas >= 8 || alcansou_limite()) {
+            digitalWrite(OUTPUT_SR, HIGH);
             Serial.println("w");
-            cont_reprovadas = 0;       
+            cont_reprovadas = 0;                   
         }
-        while (analogRead(INPUT_E2) < 500) {} // Esperar o carro sair da área de checagem para a próxima etapa
-                etapa = 2;                                
+        
+        while (analogRead(INPUT_E2) < 500) {}            
+            etapa = 2;                                
     }
 }
 
 void primeira_inspecao() {
     delay(1000);
-    if (analogRead(INPUT_E2) < 500) { // Voltando para a área de checagem
+    if (analogRead(INPUT_E2) < 500) {
         delay(1000);
         if (analogRead(INPUT_E4) > 500) {
-            Serial.println("p");
+            Serial.println("p1");
         } else {
-            Serial.println("s");
+            Serial.println("p2");
         }
 
-        // Variável para controlar o tempo
         unsigned long startTime = millis();
 
-        // Mantém a lógica de aguardar até que INPUT_E2 saia da condição < 500
         while (analogRead(INPUT_E2) < 500) {
             if (Serial.available() > 0) {
                 char ser = Serial.read();
@@ -110,36 +141,30 @@ void primeira_inspecao() {
                 }
             }
 
-            // Verifica se se passaram 5 segundos sem resposta
             if (millis() - startTime > 2000) {
-                digitalWrite(OUTPUT_SR, HIGH); // Aciona SR
+                digitalWrite(OUTPUT_SR, HIGH);
                 defeito_v1 = 1;
                 break;
             }
         }
 
-        // Aguarda até que INPUT_E2 saia da condição < 500
         while (analogRead(INPUT_E2) < 500) {}
-
         etapa = 3;
     }
 }
 
-
 void segunda_inspecao() {
     delay(1000);
-    if (analogRead(INPUT_E2) < 500) { // Voltando para a área de checagem
+    if (analogRead(INPUT_E2) < 500) {
         delay(1000);
         if (analogRead(INPUT_E4) > 500) {
-            Serial.println("p");
+            Serial.println("p1");
         } else {
-            Serial.println("s");
+            Serial.println("p2");
         }
 
-        // Variável para controlar o tempo
         unsigned long startTime = millis();
 
-        // Mantém a lógica de aguardar até que INPUT_E2 saia da condição < 500
         while (analogRead(INPUT_E2) < 500) {
             if (Serial.available() > 0) {
                 char ser = Serial.read();
@@ -151,18 +176,15 @@ void segunda_inspecao() {
                 }
             }
 
-            // Verifica se se passaram 1 segundos sem resposta
             if (millis() - startTime > 2000) {
-                digitalWrite(OUTPUT_SR, HIGH); // Aciona SR
+                digitalWrite(OUTPUT_SR, HIGH);
                 defeito_v2 = 1;
                 break;
             }
         }
 
-        // Aguarda até que INPUT_E2 saia da condição < 500
-        while (analogRead(INPUT_E2) < 500) {}
-        
-        etapa = 0;
+        while (analogRead(INPUT_E2) < 500) {}        
+        etapa = 0;        
     }
 }
 
@@ -172,7 +194,6 @@ void reset_sinalizador() {
         cont_reprovadas = 0;
     }
 }
-
 
 void setup() {
 
@@ -191,8 +212,7 @@ void setup() {
     digitalWrite(OUTPUT_S1, LOW);
     digitalWrite(OUTPUT_S2, LOW);
     digitalWrite(OUTPUT_S3, HIGH);
-    digitalWrite(OUTPUT_SR, LOW);
-     
+    digitalWrite(OUTPUT_SR, LOW);     
 }
 
 void loop() {
@@ -208,7 +228,6 @@ void loop() {
        }
 
        else if(ser == 'y') {
-        //A interface enviou um modo espera para o arduino
         digitalWrite(OUTPUT_S3, HIGH);
         etapa = -1;
        }
@@ -217,7 +236,7 @@ void loop() {
     reset_sinalizador();
 
     if (etapa == 0) aguarda_inicio();
-    else if (etapa == 1)verifica_defeito(); //verifica os defeitos antes de inspecionar? Não deveria ser o inverso? |Pois ele irá responder para o ciclo anterior|
+    else if (etapa == 1)verifica_defeito();
     else if (etapa == 2)primeira_inspecao();
     else if (etapa == 3)segunda_inspecao();
 }
