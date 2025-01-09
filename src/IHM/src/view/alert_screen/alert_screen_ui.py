@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'alert_screenuKZjsi.ui'
+## Form generated from reading UI file 'alert_screen.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.1
+## Created by: Qt User Interface Compiler version 6.7.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -38,7 +38,7 @@ class Ui_Dialog(object):
         self.label.setPixmap(QPixmap(u"projetos/inspecao-tampografia-switch-8p/docs_image/alert_background.png"))
         self.horizontalLayoutWidget = QWidget(Dialog)
         self.horizontalLayoutWidget.setObjectName(u"horizontalLayoutWidget")
-        self.horizontalLayoutWidget.setGeometry(QRect(20, 330, 321, 80))
+        self.horizontalLayoutWidget.setGeometry(QRect(0, 320, 361, 80))
         self.horizontalLayout = QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)

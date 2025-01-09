@@ -14,9 +14,9 @@ class HMIReceiver(IPCServer, ABC):
     def __init__(self):
         super().__init__("/tmp/IHM",packet_schema=BASE_PACKET_SCHEMA)
         self._receive_packet_handler_thread = None
-        self._ihm_status = {
+        self._ihm_status: dict= {
             'model': None,
-            'button': None
+            'button': False
         }
     # def _read_packet(self):
     #     packet_struct_length = self._client.recv(PACKET_LENGTH)
@@ -53,8 +53,11 @@ class HMIReceiver(IPCServer, ABC):
     def get_model_index(self) -> int | None:
         return self._ihm_status['model']
 
-    def get_status_button_continue(self):
-        return self._ihm_status['button']
+    def get_status_button_continue(self) -> bool:
+        if self._ihm_status['button'] is True:
+            self._ihm_status.update({'button': False})
+            return True
+        return self._ihm_status.get('button',False)
 
     def open_limit_exceed_screen(self):
         self._send_packet(Packet("0", PacketType.REQUEST, "limit_exceed", {}))
