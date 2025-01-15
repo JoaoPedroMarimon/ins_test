@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (QMainWindow, QSizePolicy, QVBoxLayout, QWidget)
 from PySide6.QtCore import QTimer, Signal
 
 from src.IHM.src.components.communication.Enum.Inspetion_result import InspectionResult
+from src.utils import map_value
 
 
 class SecondScreen(QWidget, Ui_Form):
@@ -23,18 +24,17 @@ class SecondScreen(QWidget, Ui_Form):
         super(SecondScreen, self).__init__()
         self.history = None
         self.setupUi(self)
-        self.queue_history = None
         self.__config_components()
         self.showFullScreen()
         self.setVisible(False)
 
     def __config_components(self):
         self.clean_placard()
-        self.confing_history()
+        self._confing_history()
         self.__config_video()
         self.button_to_model_screen.clicked.connect(self.to_first_screen)
 
-    def confing_history(self):
+    def _confing_history(self):
         self.history = History(self.hist_container)
         self.hist_container.layout().addWidget(self.history)
 
@@ -48,22 +48,23 @@ class SecondScreen(QWidget, Ui_Form):
         self.history.clean_history()
         self.OpenFirstScreen.emit()
 
-    def set_markers_on_placard(self,postion:str,markers_list):
-        new_font = self.label_placard.font()
-        new_font.setPointSize(11)
-        self.label_placard.setFont(new_font)
+    def set_markers_on_placard(self, position:str, markers_list):
+        if markers_list is not None and len(markers_list) != 0:
+            new_font = self.label_placard.font()
+            font_size = map_value(len(markers_list),1,50,self.label_placard.size().height()/8,16)
+            new_font.setPixelSize(font_size)
+            self.label_placard.setFont(new_font)
 
-        if markers_list is not None:
             markers_name = [makers["name"] for makers in markers_list]
             markers_name = ", ".join(markers_name)
             if self.label_placard.text() == "EQUIPE AUTOMAÇÃO - INTELBRAS":
-                self.label_placard.setText(f"{postion}: {markers_name}\n\n")
+                self.label_placard.setText(f"{position}: {markers_name}\n\n")
             else:
-                self.label_placard.setText(f"{self.label_placard.text()}{postion}: {markers_name}")
+                self.label_placard.setText(f"{self.label_placard.text()}{position}: {markers_name}")
 
     def clean_placard(self):
             new_font = self.label_placard.font()
-            new_font.setPointSize(16)
+            new_font.setPointSize(23)
             self.label_placard.setFont(new_font)
             self.label_placard.setText("EQUIPE AUTOMAÇÃO - INTELBRAS")
 
@@ -74,7 +75,7 @@ class SecondScreen(QWidget, Ui_Form):
         return self.model_label.text()
 
 
-    def mostrar_aprovado_reprovado(self, resultado: InspectionResult):
+    def show_inspection_result(self, position,resultado: InspectionResult):
         if resultado == InspectionResult.APROVADO:
             self.video.approved_plate()
 

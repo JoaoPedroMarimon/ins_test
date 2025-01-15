@@ -17,6 +17,9 @@ from .logger import handle_exception
 
 PACKET_LENGTH = 4
 
+def map_value(x, in_min, in_max, out_min, out_max):
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
 
 def load_json_configfile(file_path: str, default: dict | list = None) -> dict | list:
     if not os.path.exists(file_path):
