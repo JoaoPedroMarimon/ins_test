@@ -3,7 +3,7 @@ import os
 import time
 from time import sleep, pthread_getcpuclockid
 from tkinter.messagebox import RETRY
-
+import random as rd
 import serial
 import src
 import cv2
@@ -133,67 +133,82 @@ def main():
     ihm.run_ihm()
 
     while ihm.is_alive():
-        index_modelo = ihm.get_model_index()
+        try:
+            index_modelo = ihm.get_model_index()
 
-        if index_modelo is None:
-            ser.write(b'y')
-            sleep(1)
-            print("Enviando 'y' para standby")
+            if index_modelo is None:
+                ser.write(b'y')
+                sleep(1)
+                print("Enviando 'y' para standby")
 
-        elif index_modelo is not None:
-            ser.write(b'x')
-            print(f"Modelo selecionado: {index_modelo}")  # Imprime apenas uma vez na mudança para valor válido
+            elif index_modelo is not None:
+                ser.write(b'x')
+                print(f"Modelo selecionado: {index_modelo}")  # Imprime apenas uma vez na mudança para valor válido
 
-            produto_config = config['products'][index_modelo]
-            pad_inspec.config = produto_config["pad-inspection"]
-            pad_inspec.templates_path = f"./samples/{produto_config['name']}/templates"
-            status = produto_config['status']
+                produto_config = config['products'][index_modelo]
+                pad_inspec.config = produto_config["pad-inspection"]
+                pad_inspec.templates_path = f"./samples/{produto_config['name']}/templates"
+                status = produto_config['status']
 
-            # Laço contínuo para monitorar a comunicação serial
-            while index_modelo is not None and ihm.is_alive():
-                if ser.in_waiting > 0:
-                    read = ser.readline().strip(b"\r\n")
-                    print(f"Recebido: {read}")
+                # Laço contínuo para monitorar a comunicação serial
+                while index_modelo is not None and ihm.is_alive():
+                     if ser.in_waiting > 0:
+                         read = ser.readline().strip(b"\r\n")
+                         print(f"Recebido: {read}")
 
-                    if read == b"p1" or read == b"p2":
-                        frame = capturar_frame(camera)
-                        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                        posicao_pasta = "posicao_1" if read == b"p1" else "posicao_2"
-                        posicao = "Posição 1" if read == b"p1" else "Posição 2"
-                        if status == 'A':
-                            salvar_imagem(frame, produto_config['name'], posicao_pasta, "geral/sem_clasif", timestamp)
-                        elif status == 'B':
-                            frame_processado,_, inspecao_ok = inspecionar_frame(frame, pad_inspec)
-                            pasta = "geral/com_clasif/ok" if inspecao_ok else "geral/com_clasif/nok"
-                            salvar_imagem(frame, produto_config['name'], posicao_pasta, pasta, timestamp)
-                        elif status == 'C':
-                            frame_processado,_, inspecao_ok = inspecionar_frame(frame, pad_inspec)
-                            classificar_resultado(inspecao_ok)
-                            ihm.send_approved(posicao) if inspecao_ok else ihm.send_reproved(posicao)
-                            ser.write(b'o' if inspecao_ok else b'n')
-                        elif status == 'D':
-                            frame_processado, markers, inspecao_ok = inspecionar_frame(frame, pad_inspec)
-                            classificar_resultado(inspecao_ok)
-                            pasta = "teste/ok" if inspecao_ok else "teste/nok"
-                            print("inspeção: ",inspecao_ok)
-                            salvar_imagem(frame, produto_config['name'], posicao_pasta, pasta, timestamp)
-                            ihm.send_markers(posicao,markers)
-                            ihm.send_approved(posicao) if inspecao_ok else ihm.send_reproved(posicao)
-                            ser.write(b'o' if inspecao_ok else b'n')
+                         if read == b"p1" or read == b"p2":
+                             frame = capturar_frame(camera)
+                             timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                             posicao_pasta = "posicao_1" if read == b"p1" else "posicao_2"
+                             posicao = "Posição 1" if read == b"p1" else "Posição 2"
+                             if status == 'A':
+                                 salvar_imagem(frame, produto_config['name'], posicao_pasta, "geral/sem_clasif", timestamp)
+                             elif status == 'B':
+                                 frame_processed,_, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+                                 pasta = "geral/com_clasif/ok" if inspecao_ok else "geral/com_clasif/nok"
+                                 salvar_imagem(frame, produto_config['name'], posicao_pasta, pasta, timestamp)
+                             elif status == 'C':
+                                 frame_processed,_, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+                                 classificar_resultado(inspecao_ok)
+                                 ihm.send_approved(posicao) if inspecao_ok else ihm.send_reproved(posicao)
+                                 ser.write(b'o' if inspecao_ok else b'n')
+                             elif status == 'D':
+                                 frame_processed, markers, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+                                 classificar_resultado(inspecao_ok)
+                                 pasta = "teste/ok" if inspecao_ok else "teste/nok"
+                                 salvar_imagem(frame, produto_config['name'], posicao_pasta, pasta, timestamp)
+                                 ihm.send_markers(posicao,markers)
+                                 ihm.send_approved(posicao) if inspecao_ok else ihm.send_reproved(posicao)
+                                 ser.write(b'o' if inspecao_ok else b'n')
+                         elif read == b"w":
+                             ihm.open_limit_exceed_screen()
+                             print("enviado aviso de limite excedido p/ tela")
 
-                    elif read == b"w":
-                        ihm.open_limit_exceed_screen()
-                        print("enviado aviso de limite excedido p/ tela")
+                         elif read == b"k":
+                             ihm.new_cycle() # clean history
+                     index_modelo = ihm.get_model_index()
 
-                    elif read == b"k":
-                        ihm.new_cycle() # clean history
-                index_modelo = ihm.get_model_index()
+                     if index_modelo is None:
+                         print("Modelo desmarcado, retornando ao modo de espera.")
+                         break  # Sai do loop e retorna ao início do loop principal
 
-                if index_modelo is None:
-                    print("Modelo desmarcado, retornando ao modo de espera.")
-                    break  # Sai do loop e retorna ao início do loop principal
+                     time.sleep(0.1)  # Pequena pausa para evitar leitura excessiva
 
-                time.sleep(0.1)  # Pequena pausa para evitar leitura excessiva
+        except OSError:
+            # abrir a tela para fechar o programa
+                    ihm.open_alert_screen_arduino()
+                    while ihm.get_alert_close() is False:
+                        time.sleep(1)
+                    break
+
+        except TypeError:
+            ser.write(b"y")
+            ihm.open_alert_screen_camera()
+            while ihm.get_alert_close() is False:
+                time.sleep(1)
+            break
+
+
 
 if __name__ == "__main__":
     main()
