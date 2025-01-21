@@ -16,10 +16,10 @@ class Singleton:
         return cls._instance
 
 
-class IHM(Singleton, Interface):
+class IHM(Singleton, Interface,HMIReceiver):
     def __init__(self, config_json):
         super().__init__()
-        self._server = HMIReceiver()
+        HMIReceiver.__init__(self)
         Config(config_json)
     def run_ihm(self):
         super()._run_interface()
@@ -29,23 +29,4 @@ class IHM(Singleton, Interface):
             return False
         return self._thread.is_alive()
 
-    def get_model_index(self) -> int | None:
-        return self._server.get_model_index()
 
-    def get_status_button_continue(self):
-        return self._server.get_status_button_continue()
-
-    def open_limit_exceed_screen(self):
-        self._server.open_limit_exceed_screen()
-
-    def send_approved(self,position: str) -> None:
-        self._server.send_approved(position)
-
-    def send_reproved(self,position: str) -> None:
-        self._server.send_reproved(position)
-
-    def send_markers(self,position: str, markers):
-        self._server.send_inspect_frame(position,markers)
-
-    def new_cycle(self) -> None:
-        self._server.new_cycle()
