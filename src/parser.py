@@ -165,6 +165,26 @@ def execute_parse(args) -> None:
                 logging.warning(f"|INSPECT| Produto '{product_data['name']}' teve inspeções"
                                 f" do tipo {args.inspection} atualizadas.")
 
+    elif args.subparser == "calibration":
+        if args.camera is None:
+            camera = verificar_conexao_camera(config["camera"])
+        else:
+            login = args.login if args.login is not None else "admin"
+            password = args.password if args.password is not None else "admin123"
+            camera = verificar_conexao_camera({
+                "server": str(args.camera),
+                "login" : login,
+                "password" : password
+            })
+        product_data = get_product_from_configfile(args.code, args.name, config)
+        if args.inspection == "pad-inspection":
+            inspection_obj = inspection.TemplateInspection(templates_path=f"./samples/{product_data['name']}/templates")
+            frame = capturar_frame(camera)
+            _, cfg = inspection_obj.frame_inspect(frame)
+            result = inspection_obj.validate_config_result(cfg)
+            return  result
+
+
     elif args.subparser == "clone":
         target_product_data = get_product_from_configfile(args.target_code, args.target_name, config)
         dest_product_data = get_product_from_configfile(args.dest_code, args.dest_name, config)
