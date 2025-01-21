@@ -5,9 +5,10 @@ from argparse import ArgumentParser
 
 from main import inspecionar_frame
 from .serial_connection import SerialController
-from . import environment as env
+from . import environment as env, get_rtsp_url
 from . import utils
 from .inspection_designer.inspection_designer import inspection
+from .utils import verificar_conexao_camera, capturar_frame
 
 
 class NotAProductError(Exception):
@@ -75,6 +76,19 @@ def main_parse():
     group.add_argument("-c", "--code", type=str, help="Código de um produto existente no arquivo.")
 
     inspect_parser.add_argument("inspection", choices=("pad-inspection", "led-inspection"),
+                                help="Tipo de inspeção visual a ser utilizada.")
+
+    calibration_parser = subparser.add_parser("calibration", help="Faz a inspeção do produto selecionado via terminal, tirando uma foto da câmera.")
+    group = calibration_parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-n", "--name", type=str, help="Nome de um produto existente no arquivo.")
+    group.add_argument("-c", "--code", type=str, help="Código de um produto existente no arquivo.")
+
+    group = calibration_parser.add_mutually_exclusive_group(required=False)
+    group.add_argument("--camera", type=str, help="Ip da câmera pelo qual vai ser tirado a foto")
+    group.add_argument("--login", type=str, help="login para acesso da câmera")
+    group.add_argument("--password", type=str, help="Senha passa acessar a câmera")
+
+    calibration_parser.add_argument("inspection", choices=("pad-inspection", "led-inspection"),
                                 help="Tipo de inspeção visual a ser utilizada.")
 
     clone_parser = subparser.add_parser("clone", help="Clona as configurações de um produto alvo "
