@@ -5,9 +5,10 @@ from argparse import ArgumentParser
 
 from main import inspecionar_frame
 from .serial_connection import SerialController
-from . import environment as env
+from . import environment as env, get_rtsp_url
 from . import utils
 from .inspection_designer.inspection_designer import inspection
+from .utils import verificar_conexao_camera, capturar_frame
 
 
 class NotAProductError(Exception):
@@ -75,6 +76,19 @@ def main_parse():
     group.add_argument("-c", "--code", type=str, help="Código de um produto existente no arquivo.")
 
     inspect_parser.add_argument("inspection", choices=("pad-inspection", "led-inspection"),
+                                help="Tipo de inspeção visual a ser utilizada.")
+
+    calibration_parser = subparser.add_parser("calibration", help="Faz a inspeção do produto selecionado via terminal, tirando uma foto da câmera.")
+    group = calibration_parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-n", "--name", type=str, help="Nome de um produto existente no arquivo.")
+    group.add_argument("-c", "--code", type=str, help="Código de um produto existente no arquivo.")
+
+    group = calibration_parser.add_mutually_exclusive_group(required=False)
+    group.add_argument("--camera", type=str, help="Ip da câmera pelo qual vai ser tirado a foto")
+    group.add_argument("--login", type=str, help="login para acesso da câmera")
+    group.add_argument("--password", type=str, help="Senha passa acessar a câmera")
+
+    calibration_parser.add_argument("inspection", choices=("pad-inspection", "led-inspection"),
                                 help="Tipo de inspeção visual a ser utilizada.")
 
     clone_parser = subparser.add_parser("clone", help="Clona as configurações de um produto alvo "
@@ -150,6 +164,26 @@ def execute_parse(args) -> None:
                 utils.dump_json_configfile(env.CONFIGFILE_PATHNAME, config)
                 logging.warning(f"|INSPECT| Produto '{product_data['name']}' teve inspeções"
                                 f" do tipo {args.inspection} atualizadas.")
+
+    elif args.subparser == "calibration":
+        if args.camera is None:
+            camera = verificar_conexao_camera(config["camera"])
+        else:
+            login = args.login if args.login is not None else "admin"
+            password = args.password if args.password is not None else "admin123"
+            camera = verificar_conexao_camera({
+                "server": str(args.camera),
+                "login" : login,
+                "password" : password
+            })
+        product_data = get_product_from_configfile(args.code, args.name, config)
+        if args.inspection == "pad-inspection":
+            inspection_obj = inspection.TemplateInspection(templates_path=f"./samples/{product_data['name']}/templates")
+            frame = capturar_frame(camera)
+            _, cfg = inspection_obj.frame_inspect(frame)
+            result = inspection_obj.validate_config_result(cfg)
+            return  result
+
 
     elif args.subparser == "clone":
         target_product_data = get_product_from_configfile(args.target_code, args.target_name, config)
