@@ -178,11 +178,11 @@ def execute_parse(args) -> None:
             })
         product_data = get_product_from_configfile(args.code, args.name, config)
         if args.inspection == "pad-inspection":
-            inspection_obj = inspection.TemplateInspection(templates_path=f"./samples/{product_data['name']}/templates")
+            inspection_obj = inspection.TemplateInspection(config=product_data['pad-inspection'],templates_path=f"./samples/{product_data['name']}/templates")
             frame = capturar_frame(camera)
             _, cfg = inspection_obj.frame_inspect(frame)
             result = inspection_obj.validate_config_result(cfg)
-            return  result
+            print(f"O Resultado do teste é: {'REPROVADO' if result == False else 'APROVADO' }")
 
 
     elif args.subparser == "clone":
