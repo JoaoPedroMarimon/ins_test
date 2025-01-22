@@ -120,7 +120,7 @@ color: rgb(246, 245, 244);</string>
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: #FFCC00; color: white;</string>
+        <string notr="true">background-color: #FFCC00; color: black;</string>
        </property>
        <property name="text">
         <string>CONTINUAR PROCESSO</string>

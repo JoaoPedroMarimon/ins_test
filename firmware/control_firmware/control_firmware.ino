@@ -94,7 +94,7 @@ void verifica_defeito() {
 
     if (alcansou_limite()) {
       digitalWrite(OUTPUT_SR, HIGH);
-      digitalWrite(OUTPUT_S3, HIGH);
+      digitalWrite(OUTPUT_S3, LOW);
       Serial.println("w");
     }
 
@@ -129,7 +129,9 @@ void primeira_inspecao() {
       if (millis() - startTime > 2000) {
         digitalWrite(OUTPUT_SR, HIGH);
         defeito_v1 = 1;
-        break;
+        digitalWrite(INPUT_S3, LOW);
+        etapa = -1;
+        return;
       }
     }
 
@@ -164,7 +166,9 @@ void segunda_inspecao() {
       if (millis() - startTime > 2000) {
         digitalWrite(OUTPUT_SR, HIGH);
         defeito_v2 = 1;
-        break;
+        digitalWrite(INPUT_S3, LOW);
+        etapa = -1;
+        return;
       }
     }
 
@@ -178,7 +182,7 @@ void reset_sinalizador() {
     // e tamber se etapa for diferente de -1
     //se etapa for igual -1 apenas desliga alarme
     if (etapa != -1) {
-      digitalWrite(OUTPUT_S3, LOW);
+      digitalWrite(OUTPUT_S3, HIGH);
     }
     digitalWrite(OUTPUT_SR, LOW);
   }
@@ -200,7 +204,7 @@ void setup() {
 
   digitalWrite(OUTPUT_S1, LOW);
   digitalWrite(OUTPUT_S2, LOW);
-  digitalWrite(OUTPUT_S3, HIGH);
+  digitalWrite(OUTPUT_S3, LOW);
   digitalWrite(OUTPUT_SR, LOW);
 }
 
@@ -209,7 +213,7 @@ void loop() {
   while (Serial.available() > 0) {
     char ser = Serial.read();
     if (ser == 'x') {
-      digitalWrite(OUTPUT_S3, LOW);
+      digitalWrite(OUTPUT_S3, HIGH);
       limpar_lista_insp();
       defeito_v1 = 1;
       defeito_v2 = 1;
@@ -217,7 +221,7 @@ void loop() {
     }
 
     else if (ser == 'y') {
-      digitalWrite(OUTPUT_S3, HIGH);
+      digitalWrite(OUTPUT_S3, LOW);
       etapa = -1;
     }
   }
