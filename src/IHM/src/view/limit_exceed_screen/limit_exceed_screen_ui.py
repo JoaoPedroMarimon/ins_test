@@ -22,7 +22,6 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(532, 630)
         Dialog.setStyleSheet(u"background-color: rgb(224, 27, 36);")
         self.verticalLayout_2 = QVBoxLayout(Dialog)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
@@ -60,13 +59,14 @@ class Ui_Dialog(object):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.image = QLabel(self.widget)
         self.image.setObjectName(u"image")
+        self.image.setEnabled(True)
         sizePolicy.setHeightForWidth(self.image.sizePolicy().hasHeightForWidth())
         self.image.setSizePolicy(sizePolicy)
-        self.image.setMaximumSize(QSize(400, 400))
-        self.image.setPixmap(QPixmap(u"perigo.png"))
+        self.image.setMaximumSize(QSize(200, 200))
+        self.image.setPixmap(QPixmap(u"../../../../../../../../../../.designer/backup/perigo.png"))
         self.image.setScaledContents(True)
         self.image.setWordWrap(False)
-        self.image.setMargin(60)
+        self.image.setMargin(20)
         self.image.setIndent(-1)
         self.image.setOpenExternalLinks(False)
 
@@ -86,7 +86,7 @@ class Ui_Dialog(object):
         font1.setPointSize(12)
         font1.setBold(True)
         self.button_continue.setFont(font1)
-        self.button_continue.setStyleSheet(u"background-color: #FFCC00; color: white;")
+        self.button_continue.setStyleSheet(u"background-color: #FFCC00; color: black;")
 
         self.verticalLayout.addWidget(self.button_continue)
 
