@@ -6,28 +6,29 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>360</width>
-    <height>420</height>
+    <width>490</width>
+    <height>238</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: #6488EA;</string>
+   <string notr="true">background-color: rgb(224, 27, 36);</string>
   </property>
-  <widget class="QLabel" name="label_2">
+  <widget class="QLabel" name="titulo">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>290</y>
-     <width>361</width>
+     <x>40</x>
+     <y>20</y>
+     <width>391</width>
      <height>31</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>18</pointsize>
+     <pointsize>20</pointsize>
+     <bold>true</bold>
     </font>
    </property>
    <property name="styleSheet">
@@ -43,50 +44,44 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>10</y>
-     <width>301</width>
-     <height>271</height>
+     <x>110</x>
+     <y>60</y>
+     <width>291</width>
+     <height>21</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>13</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);</string>
    </property>
    <property name="text">
-    <string/>
-   </property>
-   <property name="pixmap">
-    <pixmap>projetos/inspecao-tampografia-switch-8p/docs_image/alert_background.png</pixmap>
+    <string>Feche o programa e abra novamente</string>
    </property>
   </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget">
+  <widget class="QPushButton" name="button">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>320</y>
-     <width>361</width>
-     <height>80</height>
+     <x>180</x>
+     <y>150</y>
+     <width>151</width>
+     <height>31</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <widget class="QPushButton" name="button_restart">
-      <property name="styleSheet">
-       <string notr="true">background-color: #00A336; color: white;</string>
-      </property>
-      <property name="text">
-       <string>REINICIAR</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="button_turn_off">
-      <property name="styleSheet">
-       <string notr="true">background-color: red; color: white;</string>
-      </property>
-      <property name="text">
-       <string>DESLIGAR</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
+   <property name="font">
+    <font>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(248, 228, 92);</string>
+   </property>
+   <property name="text">
+    <string>Fechar</string>
+   </property>
   </widget>
  </widget>
  <resources/>

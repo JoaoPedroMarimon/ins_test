@@ -29,7 +29,7 @@ class VideoPreview(QWidget):
         if config_camera is None:
             self._camera_source = get_rtsp_url("192.168.1.108", "admin", "admin123", subtype=1)
         else:
-            self._camera_source = get_rtsp_url(**config_camera)
+            self._camera_source = get_rtsp_url(**config_camera,subtype=1)
         self._size: tuple[int, int] = (self.parent().height(),self.parent().width())
         self.photo_viewer = PhotoViewer(self)
 
