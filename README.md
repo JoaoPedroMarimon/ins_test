@@ -21,6 +21,7 @@ Depois da cópia ser feita, entre ná pasta do projeto e insira a permissão de 
 
 Se a execução tiver sucesso, todas as bibliotecas do projeto serão instaladas, também será criado um atalho na Área de Trabalho para execução do projeto. Álem disso o projeto será configurado para abrir automaticamente ao se logar no computador.
 
+(Opcional) Caso já tenha sido feita as configurações para inspeção previamente, é preciso que você o cole na pasta inicial do projeto, com o nome de conf.json
 
 ## Utilização
 
@@ -55,11 +56,32 @@ O procedimento pode assumir estas categorias:
 
 #### Remoção de modelos da lista de modelos inspecionáveis
 Irá remover o modelo da lista, utilizando o nome ou o código do modelo como referente.
-`$ inspection.py del (-n <Nome do modelo> | -c <Código do modelo>)`
 
-**exemplo**: `$ python3 inspection.py del --name "SG800 Q+"` ou `$ python3 inspection.py del --code 4760089`
+`$ inspection.py del (-n <Nome do modelo> OU -c <Código do modelo>)`
+
+**exemplo**: `$ python3 inspection.py del --name "SG 800 Q+"` ou `$ python3 inspection.py del --code 4760089`
 
 ### Inserindo as classes de inspeção dos modelos
-Depois de inserir o modelo na lista de modelos inspecionáveis, é necessário colocar as partes que serão verificadas resultando na aprovação ou reprovação.
-x
+Depois de inserir o modelo na lista de modelos inspecionáveis, é necessário colocar as partes da tampografia que serão verificadas, resultando na aprovação ou reprovação.
 
+Para isso é necessário usar o programa Inspection, localizado na pasta do projeto, pelo comando: 
+
+`$ python3 inspection.py inspect (--name <Nome do modelo> OU -c <Código do modelo>) pad-inspection`
+
+**exemplo:** 
+`$ python3 inspection.py inspect --name "SF800 Q+" pad-inspection`
+
+<img src="./src/static/docs/inspection.png" width="500">
+
+Depois acesse a imagem do produto atravez do **FILE** (Botão no canto superior direito) **> OPEN > "CAMINHO DA FOTO"**
+
+
+ou se você estiver com a câmera de inspeção já direcionado ao produto você pode acessar a visualização da câmera **FILE > OPEN CAMERA**
+
+Como resultado irá aparecer a tela de inspeção
+<img src="./src/static/docs/tela de inspecao.png" width="500">
+
+Para recortar as partes para a inspeção é preciso recortar a área para a inspeção da parte.
+Exemplo o "I" da placa. No qual recortamos a parte e nomeamos. 
+
+<img src="./src/static/docs/I.png" width="250">
