@@ -100,3 +100,5 @@ Exemplo do "I" da placa, no qual indicamos a sua área e a nomeamos.
 Ao clicar na área de verificação recém criada, irá abrir uma tela no qual poderá fazer os recortes que serão usados na inspeção. Também permitindo habilitar ou desabilitar a inspeção dessa região apartir do botão de **Habilitar** no topo da janela.
 
 <img src="./src/static/docs/recorte.png" width="150">
+
+Made with 💜 by Intelbras 👋
