@@ -12,6 +12,8 @@ if [ ! -d "$DIR/venv" ]; then
 fi
 source "$DIR/venv/bin/activate"
 pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org -r "$DIR/requirements.txt" || { echo "Failed to install requirements"; exit 1; }
+cd $DIR
+python3 -c "import src;src.load_json_configfile(src.CONFIGFILE_PATHNAME, default=src.DEFAULT_CONFIGFILE)"
 deactivate
 
 
@@ -36,7 +38,7 @@ After=graphical.target
 [Service]
 Type=simple
 ExecStart="$DIR/run.sh"
-User=tampografia
+User=$USER
 Environment="QT_QPA_PLATFORM=wayland"  
 Environment="WAYLAND_DISPLAY=wayland-0"  
 Environment="XDG_RUNTIME_DIR=/run/user/1000"  
