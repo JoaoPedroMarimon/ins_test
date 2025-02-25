@@ -1,10 +1,7 @@
 from abc import ABC
-from typing import Dict, Callable, Any
-
-import numpy as np
-from PySide6.QtCore import QObject, Signal
-from src.IHM.src.components.communication.interfaces.qt_ipc_client import QtIPCClient
+from PySide6.QtCore import Signal
 from src.IHM.src.components.communication.Enum.Inspetion_result import InspectionResult
+from src.IHM.src.components.communication.interfaces.qt_ipc_client import QtIPCClient
 from src.IHM.src.components.communication.packet.packet import Packet
 from src.IHM.src.components.communication.packet.packet import PacketType
 from src.IHM.src.components.communication.packet.utils import BASE_PACKET_SCHEMA

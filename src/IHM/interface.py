@@ -1,10 +1,5 @@
 from multiprocessing import Process
 from PySide6.QtWidgets import QApplication
-import time
-
-from numpy.distutils.command.config import config
-
-from src.IHM.src.config import Config
 from src.IHM.src.view.controller_view.controller_view import ControllerView
 
 class Interface:
@@ -20,8 +15,8 @@ class Interface:
     def __config_thread(self):
         self._worker = self._run_ihm
         self._thread = Process(target=self._worker)
-
-    def _run_ihm(self):
+    @staticmethod
+    def _run_ihm():
         app = QApplication()
         controller_view = ControllerView()
         controller_view.show()

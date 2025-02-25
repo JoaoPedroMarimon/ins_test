@@ -1,17 +1,10 @@
 import logging
 import os
 import time
-from time import sleep, pthread_getcpuclockid
-from tkinter.messagebox import RETRY
-import random as rd
-import serial
+from time import sleep
 import src
 import cv2
-
 from datetime import datetime
-from logging import exception
-
-from src.ArduinoPlaceHolder.arduino import Arduino
 
 
 def verificar_conexao_serial(args):
