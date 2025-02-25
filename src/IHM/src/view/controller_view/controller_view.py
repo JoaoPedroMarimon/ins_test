@@ -1,7 +1,4 @@
-from operator import index
-
 from PySide6.QtCore import QObject
-
 from src.IHM.src.config import Config
 from src.IHM.src.view.alert_screen.alert_screen import AlertScreen
 from src.IHM.src.view.limit_exceed_screen.limit_exceed import LimitExceed
@@ -74,8 +71,8 @@ class ControllerView(QObject):
         model_name = self.get_switch_model()
         if model_name == 'MODELO SWITCH':
             return None
-        index = [model_index for model_index, model in enumerate(self.__product_json) if model_name in model.values()].pop()
-        return index
+        index_ = [model_index for model_index, model in enumerate(self.__product_json) if model_name in model.values()].pop()
+        return index_
 
     def get_switch_model(self) -> str:
         return self.second_screen.get_name_switch()

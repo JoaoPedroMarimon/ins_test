@@ -1,9 +1,7 @@
 import json
 import struct
 from pathlib import Path
-
 from jsonschema import validate
-
 from .packet import Packet, PacketType
 
 PACKET_LENGTH = 4  # 4 bytes is just over 4GB, sufficient for most cases

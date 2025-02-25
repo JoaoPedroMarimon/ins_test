@@ -1,13 +1,12 @@
-import logging
 import argparse
+import logging
 import re
 from argparse import ArgumentParser
 
-from main import inspecionar_frame
-from .serial_connection import SerialController
-from . import environment as env, get_rtsp_url
+from . import environment as env
 from . import utils
 from .inspection_designer.inspection_designer import inspection
+from .serial_connection import SerialController
 from .utils import verificar_conexao_camera, capturar_frame
 
 

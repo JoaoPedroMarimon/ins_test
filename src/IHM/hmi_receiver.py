@@ -1,13 +1,8 @@
-from abc import ABC
 from threading import Thread
 
-import numpy as np
-from numpy.random.mtrand import Sequence
-
 from src.IHM.src.components.communication.interfaces.ipc_server import IPCServer
-from src.IHM.src.components.communication.packet.utils import BASE_PACKET_SCHEMA
 from src.IHM.src.components.communication.packet.packet import Packet, PacketType
-from src.utils import PACKET_LENGTH
+from src.IHM.src.components.communication.packet.utils import BASE_PACKET_SCHEMA
 
 
 class HMIReceiver(IPCServer):
