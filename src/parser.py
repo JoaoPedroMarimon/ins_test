@@ -1,12 +1,13 @@
-import logging
 import argparse
+import logging
 import re
 from argparse import ArgumentParser
 
-from .serial_connection import SerialController
 from . import environment as env
 from . import utils
 from .inspection_designer.inspection_designer import inspection
+from .serial_connection import SerialController
+from .utils import verificar_conexao_camera, capturar_frame
 
 
 class NotAProductError(Exception):
@@ -54,12 +55,13 @@ def main_parse():
     add_parser = subparser.add_parser("add", help="Adiciona um novo produto no arquivo.")
     add_parser.add_argument("name", type=str, help="Nome do produto, sem caracteres especiais.")
     add_parser.add_argument("code", type=str, help="Código do produto.")
-    add_parser.add_argument("test_config_name", type=str, help="Nome da configuração de teste (vantage).")
+    add_parser.add_argument("status", type=str, help="Status da inspecao.")
 
     edit_parser = subparser.add_parser("edit", help="Edita um produto existente no arquivo.")
     group = edit_parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-n", "--name", type=str, help="Nome de um produto existente no arquivo.")
     group.add_argument("-c", "--code", type=str, help="Código de um produto existente no arquivo.")
+    group.add_argument("-s", "--status", type=str, help="Status da inspecao.")
 
     del_parser = subparser.add_parser("del", help='Apaga um produto existente do arquivo, além de suas pastas.')
     group = del_parser.add_mutually_exclusive_group(required=True)
@@ -73,6 +75,19 @@ def main_parse():
     group.add_argument("-c", "--code", type=str, help="Código de um produto existente no arquivo.")
 
     inspect_parser.add_argument("inspection", choices=("pad-inspection", "led-inspection"),
+                                help="Tipo de inspeção visual a ser utilizada.")
+
+    calibration_parser = subparser.add_parser("calibration", help="Faz a inspeção do produto selecionado via terminal, tirando uma foto da câmera.")
+    group = calibration_parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-n", "--name", type=str, help="Nome de um produto existente no arquivo.")
+    group.add_argument("-c", "--code", type=str, help="Código de um produto existente no arquivo.")
+
+    group = calibration_parser.add_mutually_exclusive_group(required=False)
+    group.add_argument("--camera", type=str, help="Ip da câmera pelo qual vai ser tirado a foto")
+    group.add_argument("--login", type=str, help="login para acesso da câmera")
+    group.add_argument("--password", type=str, help="Senha passa acessar a câmera")
+
+    calibration_parser.add_argument("inspection", choices=("pad-inspection", "led-inspection"),
                                 help="Tipo de inspeção visual a ser utilizada.")
 
     clone_parser = subparser.add_parser("clone", help="Clona as configurações de um produto alvo "
@@ -91,8 +106,6 @@ def main_parse():
                        help="Código do produto destino existente no arquivo.")
 
     group = clone_parser.add_argument_group()
-    group.add_argument("-lic", "--led-inspection-config", action="store_true",
-                       help="Clona as configurações da inspeção de LEDS.")
     group.add_argument("-pic", "--pad-inspection-config", action="store_true",
                        help="Clona as configurações da inspeção de tampografia")
     return parser.parse_args()
@@ -116,10 +129,9 @@ def execute_parse(args) -> None:
 
     if args.subparser == "add":
         product_data = {"name": args.name.upper().replace(" ", ""),
-                        "test_config_name": args.test_config_name.upper().replace(" ", ""),
                         "code": args.code,
-                        "led-inspection": {"active": True, "inspection_areas": {}},
-                        "pad-inspection": {"active": True, "inspection_areas": {}}}
+                        "status": args.status.upper().replace(" ", ""),
+                        "pad-inspection": {"active": True, "classes": []}}
 
         config["products"].append(product_data)
         config["products"] = sorted(config["products"], key=lambda x: int(x["code"]))
@@ -141,18 +153,36 @@ def execute_parse(args) -> None:
         product_data = get_product_from_configfile(args.code, args.name, config)
 
         if args.inspection == "pad-inspection":
-            inspection_obj = inspection.PadInspection(True, f"./src/products/{product_data['name']}")
-        else:
-            inspection_obj = inspection.LedInspection(True)
+            inspection_obj = inspection.TemplateInspection(templates_path=f"./samples/{product_data['name']}/templates")
 
-        inspection_obj.config = product_data[args.inspection]
-        window = inspection_obj.designer(product_data['name'])
-        window.load_video_source(utils.get_rtsp_url(**config["camera"]))
-        do_save = window.mainloop()
-        if do_save:
-            utils.dump_json_configfile(env.CONFIGFILE_PATHNAME, config)
-            logging.warning(f"|INSPECT| Produto '{product_data['name']}' teve inspeções"
-                            f" do tipo {args.inspection} atualizadas.")
+            inspection_obj.config = product_data[args.inspection]
+            window = inspection_obj.load_designer(product_data['name'])
+      #      window.load_video_source(utils.get_rtsp_url(**config["camera"]))
+            do_save = window.mainloop()
+            if do_save:
+                utils.dump_json_configfile(env.CONFIGFILE_PATHNAME, config)
+                logging.warning(f"|INSPECT| Produto '{product_data['name']}' teve inspeções"
+                                f" do tipo {args.inspection} atualizadas.")
+
+    elif args.subparser == "calibration":
+        if args.camera is None:
+            camera = verificar_conexao_camera(config["camera"])
+        else:
+            login = args.login if args.login is not None else "admin"
+            password = args.password if args.password is not None else "admin123"
+            camera = verificar_conexao_camera({
+                "server": str(args.camera),
+                "login" : login,
+                "password" : password
+            })
+        product_data = get_product_from_configfile(args.code, args.name, config)
+        if args.inspection == "pad-inspection":
+            inspection_obj = inspection.TemplateInspection(config=product_data['pad-inspection'],templates_path=f"./samples/{product_data['name']}/templates")
+            frame = capturar_frame(camera)
+            _, cfg = inspection_obj.frame_inspect(frame)
+            result = inspection_obj.validate_config_result(cfg)
+            print(f"O Resultado do teste é: {'REPROVADO' if result == False else 'APROVADO' }")
+
 
     elif args.subparser == "clone":
         target_product_data = get_product_from_configfile(args.target_code, args.target_name, config)
@@ -160,8 +190,6 @@ def execute_parse(args) -> None:
 
         # it clones only when -lic and/or -pic are specified
         if args.led_inspection_config or args.pad_inspection_config:
-            if args.led_inspection_config:
-                dest_product_data["led-inspection"] = target_product_data["led-inspection"]
             if args.pad_inspection_config:
                 dest_product_data["pad-inspection"] = target_product_data["pad-inspection"]
 

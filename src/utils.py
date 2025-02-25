@@ -15,6 +15,11 @@ from serial.tools.list_ports import comports
 
 from .logger import handle_exception
 
+PACKET_LENGTH = 4
+
+def map_value(x, in_min, in_max, out_min, out_max):
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
 
 def load_json_configfile(file_path: str, default: dict | list = None) -> dict | list:
     if not os.path.exists(file_path):
@@ -207,3 +212,41 @@ def is_camera_working(src: str):
         result = True
         cap.release()  # Release the camera when done
     return result
+
+def verificar_conexao_camera(config_camera):
+    """
+    Função que tenta se conectar à câmera até ter sucesso.
+    """
+    camera = None
+    url = get_rtsp_url(**config_camera)  # Obtém a URL RTSP
+    logging.debug(url)  # Adiciona URL da câmera no log para depuração
+
+    while camera is None:
+        try:
+            print(f"Tentando conectar à câmera com URL {url}...")
+            succeeded, timed_out = try_camera_connection(url, timeout=5.8)
+            if not succeeded or timed_out:
+                print("Não foi possível se conectar com a câmera, tentando novamente...")
+                time.sleep(3)  # Espera 3 segundos antes de tentar novamente
+            else:
+                camera = ThreadedVideoCapture(url, exception=True, timeout=20)  # Conexão bem-sucedida
+                print("Conectado à câmera com sucesso.")
+        except Exception as e:
+            print(f"Erro ao conectar à câmera: {e}")
+            camera = None  # Garante que ele tente novamente no loop
+            time.sleep(3)  # Espera 3 segundos antes de tentar novamente
+    return camera
+
+def capturar_frame(camera):
+    """
+    Captura um frame da câmera.
+
+    :param camera: Objeto da câmera.
+    :return: O frame capturado.
+    """
+    ret, frame = camera.read()
+    if not ret:
+        print("Erro ao capturar frame")
+        return None
+    return frame
+

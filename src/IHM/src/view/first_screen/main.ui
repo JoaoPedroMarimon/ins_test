@@ -10,6 +10,12 @@
     <height>480</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="font">
    <font>
     <family>NimbusSanL</family>
@@ -23,7 +29,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
@@ -36,6 +42,12 @@
       <width>800</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
     </property>
     <property name="maximumSize">
      <size>
@@ -64,9 +76,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
+      <y>20</y>
       <width>121</width>
-      <height>61</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="font">
@@ -120,7 +132,7 @@
              <string notr="true">background-color: #008000; color: white;</string>
             </property>
             <property name="text">
-             <string>Toggle Switch</string>
+             <string>SF 800 Q+</string>
             </property>
            </widget>
           </item>
@@ -143,7 +155,7 @@
              <string notr="true">background-color: #008000; color: white;</string>
             </property>
             <property name="text">
-             <string>Lever Switch</string>
+             <string>SG 800 Q+</string>
             </property>
            </widget>
           </item>
@@ -176,7 +188,7 @@
              <string notr="true">background-color: #008000; color: white;</string>
             </property>
             <property name="text">
-             <string>Key Switch</string>
+             <string>S 1108 F</string>
             </property>
            </widget>
           </item>
@@ -199,63 +211,7 @@
              <string notr="true">background-color: #008000; color: white;</string>
             </property>
             <property name="text">
-             <string>Push Button Switch</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="QWidget" name="widget_2" native="true">
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item>
-           <widget class="QPushButton" name="button_model_e">
-            <property name="maximumSize">
-             <size>
-              <width>400</width>
-              <height>75</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Helvetica Now Var Text Medium</family>
-              <pointsize>12</pointsize>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">background-color: #008000; color: white;</string>
-            </property>
-            <property name="text">
-             <string>Dual In-line Package Switch</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="button_model_f">
-            <property name="maximumSize">
-             <size>
-              <width>400</width>
-              <height>75</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Helvetica Now Var Micro Medium</family>
-              <pointsize>12</pointsize>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">background-color: #008000; color: white;</string>
-            </property>
-            <property name="text">
-             <string>Reed Switch</string>
+             <string>S 1108 G</string>
             </property>
            </widget>
           </item>

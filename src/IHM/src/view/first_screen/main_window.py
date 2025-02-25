@@ -1,3 +1,5 @@
+from functools import partial
+
 from src.IHM.src.view.first_screen.main_window_ui import Ui_MainWindow
 from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QLabel,
     QMainWindow, QPushButton, QSizePolicy, QWidget)
@@ -8,16 +10,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     modelSig = Signal(str)
     OpenSecondScreen = Signal()
     OnClose = Signal()
-    def __init__(self):
+    def __init__(self, product_json):
         super(MainWindow, self).__init__()
         self.setupUi(self)
-        # Executa uma função lambda(anônima) em linha, fazendo com que chame a função de mostrar a tela passando o modelo
-        self.button_model_a.clicked.connect(lambda: self.set_model_switch('TOGGLE SWITCH'))
-        self.button_model_b.clicked.connect(lambda: self.set_model_switch('LEVER SWITCH'))
-        self.button_model_c.clicked.connect(lambda: self.set_model_switch('KEY SWITCH'))
-        self.button_model_d.clicked.connect(lambda: self.set_model_switch('PUSH BUTTON SWITCH'))
-        self.button_model_e.clicked.connect(lambda: self.set_model_switch('DUAL IN-LINE PACKAGE SWITCH'))
-        self.button_model_f.clicked.connect(lambda: self.set_model_switch('REED SWITCH'))
+        button_list = [self.button_model_a_2,self.button_model_b_2,self.button_model_c_2,self.button_model_d_2]
+        index = 0
+        for index, product in enumerate(product_json):
+            button_list[index].setText(product['name'])
+            button_list[index].clicked.connect(partial(self.set_model_switch,product['name']))
+        button_list = button_list[index+1:]
+        for button in button_list:
+            button.setVisible(False)
+
 
     def closeEvent(self, event):
         self.OnClose.emit()
@@ -27,7 +31,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setVisible(False)
         self.OpenSecondScreen.emit()
 
-    def set_model_switch(self, model_name):
+    def set_model_switch(self, model_name: str) -> None:
         self.modelSig.emit(model_name)
         self.to_second_screen()
         """

@@ -12,7 +12,7 @@ class VideoQThread(QThread):
 
     The Signals act like pass through class functions.
     A Parent Class who use the VideoQThread can pass functions to change ou send something in Parent class
-    ImageSig - receive a function two send the image from the camera
+    ImageSig - receive a function to send the image from the camera
     VideoOpenedSig - execute the function received when video open
     VideoNotOpenedSig - execute the function received when video NOT open
     frameNotRetSig - execute the function when have error to get the ret of the frame

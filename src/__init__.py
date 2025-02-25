@@ -7,14 +7,15 @@ from .environment import (DEFAULT_CONFIGFILE, CONFIGFILE_PATHNAME,
 
 
 from .IHM.interface import Interface
-from .IHM.hmi_client import HMIClient
-from .inspection_designer.inspection_designer.inspection import PadInspection
+from .IHM.ihm import IHM
+#from .inspection_designer.inspection_designer.inspection import PadInspection
+#from .interface import Interface
+from .inspection_designer.inspection_designer.inspection import TemplateInspection
 from .logger import init_logging
 #from .messenger.messenger import QueueMessenger
-from .parser import main_parse, execute_parse, get_product_from_configfile
 from .serial_connection import SerialController
-
 from .utils import (get_port_connection, get_all_ports,
                     load_json_configfile, get_rtsp_url,
                     ThreadedVideoCapture,
                     try_camera_connection)
+from .parser import main_parse, execute_parse, get_product_from_configfile
