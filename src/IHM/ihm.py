@@ -1,7 +1,3 @@
-from typing import Sequence
-
-import numpy as np
-
 from src.IHM.hmi_receiver import HMIReceiver
 from .interface import Interface
 from .src.config import Config

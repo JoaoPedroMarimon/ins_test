@@ -1,8 +1,3 @@
-import dataclasses
-from typing import Sequence
-
-import numpy as np
-from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QWidget, QSizePolicy
 
 from src.IHM.src.components.inspection_return.inspection_return import InspectionReturn

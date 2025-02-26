@@ -35,17 +35,17 @@ Além do uso cotidiano através do atalho, também tem acesso a outras funções
 
 Mostra todas as opções e parâmetros utilizáveis.
 ```bash
-  python3 inspection.py -h
+  python3 main.py -h
 ```
 
 ### Adição de modelos na lista de modelos inspecionáveis
 Irá adicionar o modelo na lista de modelos que podem ser inspecionados pelo aplicativo.
 ```bash
-  python3 inspection.py add <Nome do modelo> <código do modelo> <procedimento de inspeção>
+  python3 main.py add <Nome do modelo> <código do modelo> <procedimento de inspeção>
 ```
 **exemplo:**
 ```bash
-   python3 inspection.py add "SG800 Q+" 4760089 D
+   python3 main.py add "SG800 Q+" 4760089 D
 ```
 Os **procedimentos de inspeção** é a forma que o aplicativo irá abordar a inspeção do produto, para poder abranger as diversas necessidades. 
 O procedimento pode assumir estas categorias:
@@ -64,22 +64,22 @@ O procedimento pode assumir estas categorias:
 ### Remoção de modelos da lista de modelos inspecionáveis
 Irá remover o modelo da lista, utilizando o nome ou o código do modelo como referente.
 
-`$ inspection.py del (-n <Nome do modelo> OU -c <Código do modelo>)`
+`$ main.py del (-n <Nome do modelo> OU -c <Código do modelo>)`
 
 **exemplo**: 
 ```bash
-   python3 inspection.py del --name "SG800 Q+"` ou `$ python3 inspection.py del --code 4760089
+   python3 main.py del --name "SG800 Q+"` ou `$ python3 main.py del --code 4760089
 ```
 ## Inserindo as classes de inspeção dos modelos
 Depois de inserir o modelo na lista de modelos inspecionáveis, é necessário colocar as partes da tampografia que serão verificadas, resultando na aprovação ou reprovação.
 
 Para isso é necessário usar o programa **_Inspection_**, localizado na pasta raiz do projeto, pelo comando: 
 
-`$ python3 inspection.py inspect (--name <Nome do modelo> OU -c <Código do modelo>) pad-inspection`
+`$ python3 main.py inspect (--name <Nome do modelo> OU -c <Código do modelo>) pad-inspection`
 
 **exemplo:** 
 ```bash
-  python3 inspection.py inspect --name "SG800 Q+" pad-inspection
+  python3 main.py inspect --name "SG800 Q+" pad-inspection
 ```
 <img src="./src/static/docs/inspection.png" width="500">
 

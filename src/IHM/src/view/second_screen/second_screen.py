@@ -1,18 +1,9 @@
-import time
-
-from PySide6.QtGui import QFont
-
-from src.IHM.src.components.history.history import History
-from src.IHM.src.components.inspection_return.inspection_return import InspectionReturn
-from src.IHM.src.components.inspection_video.inspection_video import InspectionVideo
-from src.IHM.src.components.video_preview.video_preview import VideoPreview
-import queue
-
-from src.IHM.src.view.second_screen.second_screen_ui import Ui_Form
-from PySide6.QtWidgets import (QMainWindow, QSizePolicy, QVBoxLayout, QWidget)
-from PySide6.QtCore import QTimer, Signal
-
+from PySide6.QtCore import Signal
+from PySide6.QtWidgets import (QWidget)
 from src.IHM.src.components.communication.Enum.Inspetion_result import InspectionResult
+from src.IHM.src.components.history.history import History
+from src.IHM.src.components.inspection_video.inspection_video import InspectionVideo
+from src.IHM.src.view.second_screen.second_screen_ui import Ui_Form
 from src.utils import map_value
 
 
@@ -75,7 +66,7 @@ class SecondScreen(QWidget, Ui_Form):
         return self.model_label.text()
 
 
-    def show_inspection_result(self, position,resultado: InspectionResult):
+    def show_inspection_result(self, _ ,resultado: InspectionResult):
         if resultado == InspectionResult.APROVADO:
             self.video.approved_plate()
 

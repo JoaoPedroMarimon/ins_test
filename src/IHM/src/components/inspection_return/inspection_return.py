@@ -1,8 +1,5 @@
 import dataclasses
-from enum import Enum
-
 from PySide6.QtCore import QTimer
-from PySide6.QtGui import Qt
 from PySide6.QtWidgets import QWidget, QSizePolicy
 
 from src.IHM.src.components.inspection_return.inspection_return_ui import Ui_inspection_return
