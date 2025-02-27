@@ -17,5 +17,5 @@ from .serial_connection import SerialController
 from .utils import (get_port_connection, get_all_ports,
                     load_json_configfile, get_rtsp_url,
                     ThreadedVideoCapture,
-                    try_camera_connection)
+                    try_camera_connection,GetImageError)
 from .parser import main_parse, execute_parse, get_product_from_configfile
