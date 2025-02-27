@@ -189,10 +189,11 @@ def main():
 
         except OSError:
             # abrir a tela para fechar o programa
-                    ihm.open_alert_screen_arduino()
-                    while ihm.get_alert_close() is False:
-                        time.sleep(1)
-                    break
+            logging.exception("Ocorreu o erro OSError ativando a tratativa do arduino")
+            ihm.open_alert_screen_arduino()
+            while ihm.get_alert_close() is False:
+                time.sleep(1)
+                break
 
         except TypeError:
             ser.write(b"y")
