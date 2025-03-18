@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import time
 from time import sleep
 import src
@@ -29,6 +30,7 @@ def verificar_conexao_serial(args):
             time.sleep(3)  # Espera 3 segundos antes de tentar novamente
     return ser
 
+
 def verificar_conexao_camera(config_camera):
     """
     Função que tenta se conectar à câmera até ter sucesso.
@@ -53,6 +55,7 @@ def verificar_conexao_camera(config_camera):
             time.sleep(3)  # Espera 3 segundos antes de tentar novamente
     return camera
 
+
 def capturar_frame(camera):
     """
     Captura um frame da câmera.
@@ -66,16 +69,17 @@ def capturar_frame(camera):
         return None
     return frame
 
-def salvar_imagem(frame, nome_produto, posicao, pasta, timestamp):
 
-    pasta=f"./samples/{nome_produto}/{posicao}/{pasta}"
-    nome_imagem=f"imagem_{nome_produto}_{timestamp}.jpg"
+def salvar_imagem(frame, nome_produto, posicao, pasta, timestamp):
+    pasta = f"./samples/{nome_produto}/{posicao}/{pasta}"
+    nome_imagem = f"imagem_{nome_produto}_{timestamp}.jpg"
 
     if not os.path.exists(pasta):
         os.makedirs(pasta)
     caminho_imagem = os.path.join(pasta, nome_imagem)
     cv2.imwrite(caminho_imagem, frame)
     print(f"Imagem processada e salva em: {caminho_imagem}")
+
 
 def inspecionar_frame(frame, pad_inspec):
     """
@@ -87,8 +91,10 @@ def inspecionar_frame(frame, pad_inspec):
     """
     frame_processado, cfg = pad_inspec.frame_inspect(frame)
     inspecao_ok = pad_inspec.validate_config_result(cfg)
-    markers_position = [{"name": class_["name"], "region": class_["region"]} for class_ in cfg["classes"] if class_["found"] == False]
+    markers_position = [{"name": class_["name"], "region": class_["region"]} for class_ in cfg["classes"] if
+                        class_["found"] == False]
     return frame_processado, markers_position, inspecao_ok
+
 
 def classificar_resultado(inspecao_ok):
     """
@@ -102,8 +108,8 @@ def classificar_resultado(inspecao_ok):
     else:
         print("NOK")
 
-def main():
 
+def main():
     args = src.main_parse()
     src.init_logging(logging.WARNING, stream_handler=True, log_directory=".", debug=args.debug)
     logging.warning(f"init with {args}")
@@ -145,47 +151,52 @@ def main():
 
                 # Laço contínuo para monitorar a comunicação serial
                 while index_modelo is not None and ihm.is_alive():
-                     if ser.in_waiting > 0:
-                         read = ser.readline().strip(b"\r\n")
-                         print(f"Recebido: {read}")
+                    if ser.in_waiting > 0:
+                        read = ser.readline().strip(b"\r\n")
+                        print(f"Recebido: {read}")
 
-                         if read == b"p1" or read == b"p2":
-                             frame = capturar_frame(camera)
-                             timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                             posicao_pasta = "posicao_1" if read == b"p1" else "posicao_2"
-                             posicao = "Posição 1" if read == b"p1" else "Posição 2"
-                             if status == 'A':
-                                 salvar_imagem(frame, produto_config['name'], posicao_pasta, "geral/sem_clasif", timestamp)
-                             elif status == 'B':
-                                 frame_processed,_, inspecao_ok = inspecionar_frame(frame, pad_inspec)
-                                 pasta = "geral/com_clasif/ok" if inspecao_ok else "geral/com_clasif/nok"
-                                 salvar_imagem(frame, produto_config['name'], posicao_pasta, pasta, timestamp)
-                             elif status == 'C':
-                                 frame_processed,_, inspecao_ok = inspecionar_frame(frame, pad_inspec)
-                                 classificar_resultado(inspecao_ok)
-                                 ihm.send_approved(posicao) if inspecao_ok else ihm.send_reproved(posicao)
-                                 ser.write(b'o' if inspecao_ok else b'n')
-                             elif status == 'D':
-                                 frame_processed, markers, inspecao_ok = inspecionar_frame(frame, pad_inspec)
-                                 classificar_resultado(inspecao_ok)
-                                 pasta = "teste/ok" if inspecao_ok else "teste/nok"
-                                 salvar_imagem(frame, produto_config['name'], posicao_pasta, pasta, timestamp)
-                                 ihm.send_markers(posicao,markers)
-                                 ihm.send_approved(posicao) if inspecao_ok else ihm.send_reproved(posicao)
-                                 ser.write(b'o' if inspecao_ok else b'n')
-                         elif read == b"w":
-                             ihm.open_limit_exceed_screen()
-                             print("enviado aviso de limite excedido p/ tela")
+                        if read == b"p1" or read == b"p2":
+                            frame = capturar_frame(camera)
+                            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                            posicao_pasta = "posicao_1" if read == b"p1" else "posicao_2"
+                            posicao = "Posição 1" if read == b"p1" else "Posição 2"
+                            if status == 'A':
+                                salvar_imagem(frame, produto_config['name'], posicao_pasta, "geral/sem_clasif",
+                                              timestamp)
+                            elif status == 'B':
+                                frame_processed, _, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+                                pasta = "geral/com_clasif/ok" if inspecao_ok else "geral/com_clasif/nok"
+                                salvar_imagem(frame, produto_config['name'], posicao_pasta, pasta, timestamp)
+                            elif status == 'C':
+                                frame_processed, _, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+                                classificar_resultado(inspecao_ok)
+                                ihm.send_approved(posicao) if inspecao_ok else ihm.send_reproved(posicao)
+                                ser.write(b'o' if inspecao_ok else b'n')
+                            elif status == 'D':
+                                frame_processed, markers, inspecao_ok = inspecionar_frame(frame, pad_inspec)
+                                classificar_resultado(inspecao_ok)
+                                pasta = "teste/ok" if inspecao_ok else "teste/nok"
+                                salvar_imagem(frame, produto_config['name'], posicao_pasta, pasta, timestamp)
+                                ihm.send_markers(posicao, markers)
+                                ihm.send_approved(posicao) if inspecao_ok else ihm.send_reproved(posicao)
+                                ser.write(b'o' if inspecao_ok else b'n')
+                        elif read == b"w":
+                            ihm.open_limit_exceed_screen()
+                            print("enviado aviso de limite excedido p/ tela")
 
-                         elif read == b"k":
-                             ihm.new_cycle() # clean history
-                     index_modelo = ihm.get_model_index()
+                        elif read == b"k":
+                            ihm.new_cycle()  # clean history
 
-                     if index_modelo is None:
-                         print("Modelo desmarcado, retornando ao modo de espera.")
-                         break  # Sai do loop e retorna ao início do loop principal
+                        elif re.match(r'^Debug', str(read)):
+                            #Regex r'^Debug' is used to know if the mesage start with "Debug"
+                            logging.warning(str(read))
+                    index_modelo = ihm.get_model_index()
 
-                     time.sleep(0.1)  # Pequena pausa para evitar leitura excessiva
+                    if index_modelo is None:
+                        print("Modelo desmarcado, retornando ao modo de espera.")
+                        break  # Sai do loop e retorna ao início do loop principal
+
+                    time.sleep(0.1)  # Pequena pausa para evitar leitura excessiva
 
         except OSError:
             # abrir a tela para fechar o programa
@@ -201,7 +212,6 @@ def main():
             while ihm.get_alert_close() is False:
                 time.sleep(1)
             break
-
 
 
 if __name__ == "__main__":
