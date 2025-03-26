@@ -71,6 +71,9 @@ def get_all_ports() -> list[str]:
     """
     return [cm.device for cm in comports() if cm.device != "/dev/ttyS0"]
 
+class GetImageError(Exception):
+    def __init__(self,message):
+        super().__init__(message)
 
 class ThreadedVideoCapture(cv2.VideoCapture):
     @handle_exception(1)
@@ -127,6 +130,7 @@ class ThreadedVideoCapture(cv2.VideoCapture):
         except Exception as e:
             logging.exception('Não foi possível obter uma imagem da câmera, é possível que tenha sido desconectada.')
             ret, frame = False, None
+            raise GetImageError('Não foi possível obter uma imagem da câmera, é possível que tenha sido desconectada.')
         else:
             ret = True
         self._read_request = False

@@ -7,6 +7,8 @@ import src
 import cv2
 from datetime import datetime
 
+from src import GetImageError
+
 
 def verificar_conexao_serial(args):
     """
@@ -206,7 +208,7 @@ def main():
                 time.sleep(1)
                 break
 
-        except TypeError:
+        except GetImageError:
             ser.write(b"y")
             ihm.open_alert_screen_camera()
             while ihm.get_alert_close() is False:
