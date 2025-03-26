@@ -32,35 +32,25 @@ int defeito_v2 = 1;
 bool enviado = false;
 const int INSPECOES_CICLO = 10;
 const int LIMITE_REPROVACAO = 5;
-bool result_list[INSPECOES_CICLO];
+bool result_list[INSPECOES_CICLO] = {false};  // Inicializando o array com false
 unsigned int step = 0;
 
 void add_insp(bool resultado) {
   result_list[step] = resultado;
-  if (step == 10) {
-    step = 0;
-  } else {
-    step++;
-  }
+  step = (step + 1) % INSPECOES_CICLO;  // Evita acesso inválido
 }
 
 void limpar_lista_insp() {
-  int num_pos = sizeof(result_list) / sizeof(result_list[0]);
-  for (int i = 0; i < num_pos; i++) {
+  for (int i = 0; i < INSPECOES_CICLO; i++) {
     result_list[i] = false;
   }
 }
+
 bool alcansou_limite() {
   int sum = 0;
-  for (int insp : result_list) {
-    sum += insp;
-  }
-  if (sum >= LIMITE_REPROVACAO) {
-    return true;
-  }
-  return false;
+  for (bool insp : result_list) sum += insp;
+  return sum >= LIMITE_REPROVACAO;
 }
-
 
 
 void aguarda_inicio() {
@@ -73,30 +63,43 @@ void aguarda_inicio() {
 
 void verifica_defeito() {
   delay(1000);
+  Serial.println("Debug: Iniciando o verifica defeito")
   if (analogRead(INPUT_E2) < 500) {
+
+  Serial.println("Debug: Inserindo defeitos")
     add_insp(defeito_v1);
     add_insp(defeito_v2);
+
+      Serial.println("Debug: Iniciando descarte")
+
     if (defeito_v1 == 1) {
       digitalWrite(OUTPUT_S1, HIGH);
       digitalWrite(OUTPUT_SR, HIGH);
+      delay(200);
     }
     if (defeito_v2 == 1) {
-      delay(100);
       digitalWrite(OUTPUT_S2, HIGH);
       digitalWrite(OUTPUT_SR, HIGH);
     }
     if (defeito_v1 == 1 || defeito_v2 == 1) {
-      delay(3000);
+      delay(2000);
     }
     digitalWrite(OUTPUT_SR, LOW);
     digitalWrite(OUTPUT_S1, LOW);
     digitalWrite(OUTPUT_S2, LOW);
+    defeito_v1 = 0;
+    defeito_v2 = 0;
 
+    Serial.println("Debug: Decisão do descarte feita")
+
+    Serial.println("Debug: Iniciando a verificação de limite")
     if (alcansou_limite()) {
       digitalWrite(OUTPUT_SR, HIGH);
-      digitalWrite(OUTPUT_S3, LOW);
+      digitalWrite(OUTPUT_S3, HIGH);
       Serial.println("w");
+      limpar_lista_insp();
     }
+    Serial.println("Debug: Limite verificado")
 
     while (analogRead(INPUT_E2) < 500) {}
     etapa = 2;
@@ -107,16 +110,22 @@ void primeira_inspecao() {
   delay(1000);
   if (analogRead(INPUT_E2) < 500) {
     delay(1000);
+      Serial.println("Debug: Iniciando primeira inspeção")
+
+      Serial.println("Debug: Enviando mensagem para o main")
+
     if (analogRead(INPUT_E4) > 500) {
       Serial.println("p1");
     } else {
       Serial.println("p2");
     }
+      Serial.println("Debug: Recebendo mensagem do main")
 
     unsigned long startTime = millis();
 
     while (analogRead(INPUT_E2) < 500) {
       if (Serial.available() > 0) {
+        Serial.println("Debug: Mensagem recebida ")
         char ser = Serial.read();
         if (ser == 'n') {
           defeito_v1 = 1;
@@ -129,13 +138,17 @@ void primeira_inspecao() {
       if (millis() - startTime > 2000) {
         digitalWrite(OUTPUT_SR, HIGH);
         defeito_v1 = 1;
-        digitalWrite(INPUT_S3, LOW);
+        digitalWrite(OUTPUT_S3, HIGH);
         etapa = -1;
+          Serial.println("Debug: Mensagem não recebida")
+
         return;
       }
     }
 
     while (analogRead(INPUT_E2) < 500) {}
+    Serial.println("Debug: Primeira inspeção finalizada ")
+
     etapa = 3;
   }
 }
@@ -144,16 +157,23 @@ void segunda_inspecao() {
   delay(1000);
   if (analogRead(INPUT_E2) < 500) {
     delay(1000);
+    Serial.println("Debug: Segunda inspeção inicializada ")
+
+    Serial.println("Debug: enviando mensagem para o main")
+
     if (analogRead(INPUT_E4) > 500) {
       Serial.println("p1");
     } else {
       Serial.println("p2");
     }
+      Serial.println("Debug: Recebendo mensagem do main")
 
     unsigned long startTime = millis();
 
     while (analogRead(INPUT_E2) < 500) {
       if (Serial.available() > 0) {
+      Serial.println("Debug:  Mensagem do main recebida")
+
         char ser = Serial.read();
         if (ser == 'n') {
           defeito_v2 = 1;
@@ -166,23 +186,29 @@ void segunda_inspecao() {
       if (millis() - startTime > 2000) {
         digitalWrite(OUTPUT_SR, HIGH);
         defeito_v2 = 1;
-        digitalWrite(INPUT_S3, LOW);
+        digitalWrite(OUTPUT_S3, HIGH);
         etapa = -1;
+      Serial.println("Debug:  Mensagem do main NÃO recebida")
+
         return;
       }
     }
 
     while (analogRead(INPUT_E2) < 500) {}
+    Serial.println("Debug: Segunda inspeção finalizada ")
+
     etapa = 0;
   }
 }
 
 void reset_sinalizador() {
   if (analogRead(INPUT_E3) < 500 && digitalRead(OUTPUT_SR) == HIGH) {
-    // e tamber se etapa for diferente de -1
+      Serial.println("Debug:  sinalizador resetado")
+
+    // e tambem se etapa for diferente de -1
     //se etapa for igual -1 apenas desliga alarme
     if (etapa != -1) {
-      digitalWrite(OUTPUT_S3, HIGH);
+      digitalWrite(OUTPUT_S3, LOW);
     }
     digitalWrite(OUTPUT_SR, LOW);
   }
@@ -204,7 +230,7 @@ void setup() {
 
   digitalWrite(OUTPUT_S1, LOW);
   digitalWrite(OUTPUT_S2, LOW);
-  digitalWrite(OUTPUT_S3, LOW);
+  digitalWrite(OUTPUT_S3, HIGH);
   digitalWrite(OUTPUT_SR, LOW);
 }
 
@@ -213,7 +239,7 @@ void loop() {
   while (Serial.available() > 0) {
     char ser = Serial.read();
     if (ser == 'x') {
-      digitalWrite(OUTPUT_S3, HIGH);
+      digitalWrite(OUTPUT_S3, LOW);
       limpar_lista_insp();
       defeito_v1 = 1;
       defeito_v2 = 1;
@@ -221,7 +247,7 @@ void loop() {
     }
 
     else if (ser == 'y') {
-      digitalWrite(OUTPUT_S3, LOW);
+      digitalWrite(OUTPUT_S3, HIGH);
       etapa = -1;
     }
   }
